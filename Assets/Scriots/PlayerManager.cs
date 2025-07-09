@@ -139,14 +139,20 @@ public class PlayerManager : MonoBehaviour
     //false - assign device to first player with no device
     void AssignNewDeviceToPlayer(InputDevice device)
     {
-        if (device is Gamepad)
+        if (device is Gamepad && device.added)
         {
             foreach (PlayerInput p in PlayerList)
             {
                 if (p.hasMissingRequiredDevices)
                 {
-                    //assign device to first deviceless PlayerInput
+                    
+                    //unpair all devices from player (removes old inactive devices)
+                    p.user.UnpairDevices();
+
+
+                    //assign new device to first deviceless PlayerInput
                     InputUser.PerformPairingWithDevice(device, p.user);
+                    
 
                     //exit
                     return;
