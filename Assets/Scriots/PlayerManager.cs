@@ -70,6 +70,8 @@ public class PlayerManager : MonoBehaviour
                             Debug.Log(device.path);
                             Debug.Log(device.ToString());
 
+                            
+
 
                             AssignNewDeviceToPlayer(device);
                             
@@ -141,18 +143,54 @@ public class PlayerManager : MonoBehaviour
     {
         if (device is Gamepad && device.added)
         {
+            
+            // We execute this code on `playerInput.onControlsChanged`
+            if (device is UnityEngine.InputSystem.Switch.SwitchProControllerHID)
+            {
+                foreach (var item in Gamepad.all)
+                {
+                    if ((item is UnityEngine.InputSystem.XInput.XInputController) && (Math.Abs(item.lastUpdateTime - device.lastUpdateTime) < 0.1))
+                    {
+                        Debug.Log($"Switch Pro controller detected and a copy of XInput was active at almost the same time. Disabling XInput device. `{device}`; `{item}`");
+                        InputSystem.DisableDevice(item);
+
+                        //ADD THIS: delete item XInput PlayerPrefab + user if user is created
+                        
+
+                    }
+                }
+            }
+            
+
+            // We execute this code on `playerInput.onControlsChanged`
+            if (device is UnityEngine.InputSystem.XInput.XInputController)
+            {
+                foreach (var item in Gamepad.all)
+                {
+                    if ((item is UnityEngine.InputSystem.Switch.SwitchProControllerHID) && (Math.Abs(item.lastUpdateTime - device.lastUpdateTime) < 0.1))
+                    {
+                        Debug.Log($"Switch Pro controller detected and a copy of XInput was active at almost the same time. Disabling XInput device. `{device}`; `{item}`");
+                        InputSystem.DisableDevice(device);
+
+                        return;
+                    }
+                }
+            }
+
+
+            
             foreach (PlayerInput p in PlayerList)
             {
                 if (p.hasMissingRequiredDevices)
                 {
-                    
+
                     //unpair all devices from player (removes old inactive devices)
                     p.user.UnpairDevices();
 
 
                     //assign new device to first deviceless PlayerInput
                     InputUser.PerformPairingWithDevice(device, p.user);
-                    
+
 
                     //exit
                     return;
