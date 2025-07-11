@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 91940134732367498}
   - component: {fileID: 8736686337939707414}
   - component: {fileID: -6040217156825170098}
+  - component: {fileID: 854338050657813883}
   m_Layer: 0
   m_Name: PlayerPrefab
   m_TagString: Untagged
@@ -205,6 +206,150 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: dc57fa76-fa06-4190-b9b7-b24ee40eac74
     m_ActionName: 'GamePlay/R/SelectRight[/SwitchProControllerHID/rightShoulder,/SwitchProControllerHID/rightTrigger]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 854338050657813883}
+        m_TargetAssemblyTypeName: CSSPlayerController, Assembly-CSharp
+        m_MethodName: OnASelect
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: ba44730c-1642-4f03-a344-c86ad87e8eb7
+    m_ActionName: 'CharacterSelect/Select/A[/SwitchProControllerHID/buttonEast,/SwitchProControllerHID1/buttonEast]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 854338050657813883}
+        m_TargetAssemblyTypeName: CSSPlayerController, Assembly-CSharp
+        m_MethodName: OnBCancel
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 90008de6-e3ec-4e2b-873a-a7a5e4bf6816
+    m_ActionName: 'CharacterSelect/Cancel/B[/SwitchProControllerHID/buttonSouth,/SwitchProControllerHID1/buttonSouth]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 854338050657813883}
+        m_TargetAssemblyTypeName: CSSPlayerController, Assembly-CSharp
+        m_MethodName: OnLeftL
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 8c3d5ec9-771d-43ed-8837-84b5c32b54b9
+    m_ActionName: 'CharacterSelect/Left/L[/SwitchProControllerHID/leftShoulder,/SwitchProControllerHID1/leftShoulder]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 854338050657813883}
+        m_TargetAssemblyTypeName: CSSPlayerController, Assembly-CSharp
+        m_MethodName: OnRightR
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 96bd037e-cee5-4bb9-8be2-b131b0e8b1ec
+    m_ActionName: 'CharacterSelect/Right/R[/SwitchProControllerHID/rightShoulder,/SwitchProControllerHID1/rightShoulder]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 854338050657813883}
+        m_TargetAssemblyTypeName: CSSPlayerController, Assembly-CSharp
+        m_MethodName: OnLeftTrig
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 30fb3359-b0a9-4b63-a612-fda828d008c4
+    m_ActionName: 'CharacterSelect/LeftTrigger[/SwitchProControllerHID/leftTrigger,/SwitchProControllerHID1/leftTrigger]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 854338050657813883}
+        m_TargetAssemblyTypeName: CSSPlayerController, Assembly-CSharp
+        m_MethodName: OnRightTrig
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 0149df1a-9ef1-4f26-841a-429233f93dc7
+    m_ActionName: 'CharacterSelect/RightTrigger[/SwitchProControllerHID/rightTrigger,/SwitchProControllerHID1/rightTrigger]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 854338050657813883}
+        m_TargetAssemblyTypeName: CSSPlayerController, Assembly-CSharp
+        m_MethodName: OnHoldBack
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: ac8c976a-7f06-4a66-b555-a5a8f3ab9c04
+    m_ActionName: 'CharacterSelect/HoldBack[/SwitchProControllerHID/buttonSouth,/SwitchProControllerHID1/buttonSouth]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 854338050657813883}
+        m_TargetAssemblyTypeName: CSSPlayerController, Assembly-CSharp
+        m_MethodName: OnJoinLR
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 8b7febc3-42cd-4e7f-8aa8-226d36f4c6b4
+    m_ActionName: 'CharacterSelect/Join/L+R[/SwitchProControllerHID/leftShoulder,/SwitchProControllerHID1/leftShoulder,/SwitchProControllerHID/rightShoulder,/SwitchProControllerHID1/rightShoulder]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 854338050657813883}
+        m_TargetAssemblyTypeName: CSSPlayerController, Assembly-CSharp
+        m_MethodName: OnShoulderJoinRTLT
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: f75bb66d-ec12-4e15-ba2b-3bfa9f210846
+    m_ActionName: 'CharacterSelect/ShoulderJoin/RT+RB[/SwitchProControllerHID/leftTrigger,/SwitchProControllerHID1/leftTrigger,/SwitchProControllerHID/rightTrigger,/SwitchProControllerHID1/rightTrigger]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Controller
   m_DefaultActionMap: GamePlay
@@ -220,5 +365,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e81dcd3cf97c2694583fb973e8e35817, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &854338050657813883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6264383407717547564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9de1b5e48b3534f4bb4157f019dab015, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
