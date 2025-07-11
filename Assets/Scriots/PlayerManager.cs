@@ -219,6 +219,9 @@ public class PlayerManager : MonoBehaviour
     {
         Debug.Log("Player " + pi.playerIndex + " Joined!");
 
+        //set PlayerManager as player obj's parent
+        pi.transform.parent = transform;
+
         //add new player to PlayerList
         PlayerList.Add(pi);
 
