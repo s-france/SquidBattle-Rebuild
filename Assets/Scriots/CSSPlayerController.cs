@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,9 +6,16 @@ using UnityEngine.InputSystem;
 
 public class CSSPlayerController : MonoBehaviour
 {
+    PlayerData data;
+    CSSLevelController lc;
+
+    [HideInInspector] public CSSWindowDisplay UIWindow;
+
     // Start is called before the first frame update
     void Start()
     {
+        lc = FindFirstObjectByType<CSSLevelController>();
+        data = GetComponent<PlayerData>();
 
     }
 
@@ -56,11 +64,43 @@ public class CSSPlayerController : MonoBehaviour
 
     public void OnJoinLR(InputAction.CallbackContext ctx)
     {
+        foreach (CSSWindowDisplay window in lc.PlayerWindows)
+        {
+            if (window.playerIdx == -1)
+            {
+                AssignUIWindow(window);
+                break;
+            }
+        }
+
 
     }
-    
+
     public void OnShoulderJoinRTLT(InputAction.CallbackContext ctx)
     {
-        
+
+    }
+
+
+    
+
+    //assigns this player to a CSS window
+    public void AssignUIWindow(CSSWindowDisplay window)
+    {
+        UIWindow = window;
+
+        window.playerIdx = data.trueIdx;
+        data.inGameIdx = Array.IndexOf(lc.PlayerWindows, window);
+    }
+
+    //unassigns UI window - unjoins player from CSS
+    public void UnassignUIWindow()
+    {
+        UIWindow.LeavePlayer();
+
+        UIWindow.playerIdx = -1;
+        data.inGameIdx = -1;
+
+        UIWindow = null;
     }
 }

@@ -16,16 +16,18 @@ public class PlayerManager : MonoBehaviour
 
     PlayerInputManager pim;
     [SerializeField] GameObject PlayerPrefab; //player obj prefab
+    public Color[] PlayerColors; //Array of equippable player colors
 
     [HideInInspector] public LevelController lc; //current scene's LevelController (updated by LC)
 
-    List<PlayerInput> PlayerList;
+    [HideInInspector] public List<PlayerInput> PlayerList;
 
 
 
     // Start is called before the first frame update
     void Start()
     {
+        
 
 
 
@@ -226,12 +228,19 @@ public class PlayerManager : MonoBehaviour
         PlayerList.Add(pi);
 
         //run LevelController player join behavior
-        lc.OnPLayerJoin();
+        lc.OnPLayerJoin(pi);
     }
 
     //called when player leave event triggered
     public void OnPlayerLeave(PlayerInput pi)
     {
+        Debug.Log("Player " + pi.playerIndex + " Left!");
+
+        //remove from PlayerList
+        PlayerList.Remove(pi);
+
+        //trigger lc player leave behavior
+        lc.OnPlayerLeave(pi);
 
     }
 

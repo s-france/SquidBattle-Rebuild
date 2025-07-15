@@ -13,9 +13,20 @@ public class LevelController : MonoBehaviour
     {
         Debug.Log("LevelController Start!");
 
-
+        //init important variables
         pm = FindFirstObjectByType<PlayerManager>();
         pm.lc = this;
+
+        //default behavior:
+        /* //not really needed rn -could be useful at some point to put default behaviors here
+        
+        //set all players input actionmaps to Gameplay
+        foreach (PlayerInput p in pm.PlayerList)
+        {
+            p.SwitchCurrentActionMap("Gameplay");
+        }
+
+        */
 
     }
 
@@ -41,7 +52,12 @@ public class LevelController : MonoBehaviour
 
     }
 
-    public virtual void OnPLayerJoin()
+    public virtual void OnPLayerJoin(PlayerInput pi)
+    {
+
+    }
+
+    public virtual void OnPlayerLeave(PlayerInput pi)
     {
         
     }
