@@ -95,7 +95,7 @@ public class CSSPlayerController : MonoBehaviour
     {
         UIWindow = window;
 
-        window.playerIdx = data.trueIdx;
+        window.playerIdx = data.pi.playerIndex;
         data.inGameIdx = Array.IndexOf(lc.PlayerWindows, window);
 
         window.JoinPlayer();
@@ -104,9 +104,13 @@ public class CSSPlayerController : MonoBehaviour
     //unassigns UI window - unjoins player from CSS
     public void UnassignUIWindow()
     {
-        UIWindow.LeavePlayer();
+        if (UIWindow != null)
+        {
+            UIWindow.LeavePlayer();
+            UIWindow.playerIdx = -1;
+        }
 
-        UIWindow.playerIdx = -1;
+        
         data.inGameIdx = -1;
 
         UIWindow = null;

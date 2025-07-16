@@ -405,7 +405,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef44763e408c3c7499f7ff0fdacd68a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trueIdx: 0
+  pi: {fileID: 8736686337939707414}
   inGameIdx: -1
   teamIdx: -1
   colorIdx: 0

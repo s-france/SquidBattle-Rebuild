@@ -21,6 +21,7 @@ public class PlayerManager : MonoBehaviour
     [HideInInspector] public LevelController lc; //current scene's LevelController (updated by LC)
 
     [HideInInspector] public List<PlayerInput> PlayerList;
+    [HideInInspector] public List<Team> Teams;
 
 
 
@@ -54,6 +55,18 @@ public class PlayerManager : MonoBehaviour
 
             //make PlayerList
             PlayerList = new List<PlayerInput>();
+
+            //make Team List
+            Teams = new List<Team>();
+            //make all 6 teams
+            //if you are reading this fuck you
+            Teams.Add(new Team(0));
+            Teams.Add(new Team(1));
+            Teams.Add(new Team(2));
+            Teams.Add(new Team(3));
+            Teams.Add(new Team(4));
+            Teams.Add(new Team(5));
+
 
             //device-change tracking event
             InputSystem.onDeviceChange +=
@@ -189,7 +202,6 @@ public class PlayerManager : MonoBehaviour
                     //unpair all devices from player (removes old inactive devices)
                     p.user.UnpairDevices();
 
-
                     //assign new device to first deviceless PlayerInput
                     InputUser.PerformPairingWithDevice(device, p.user);
 
@@ -227,6 +239,11 @@ public class PlayerManager : MonoBehaviour
         //add new player to PlayerList
         PlayerList.Add(pi);
 
+        
+
+        //assign to first empty team
+        SetTeam(pi.GetComponent<PlayerData>(), Teams.Find(t => t.Players.Count == 0));
+
         //run LevelController player join behavior
         lc.OnPlayerJoin(pi);
     }
@@ -239,6 +256,9 @@ public class PlayerManager : MonoBehaviour
         //remove from PlayerList
         PlayerList.Remove(pi);
 
+        //remove from Team
+        LeaveTeam(pi.GetComponent<PlayerData>());
+
         //trigger lc player leave behavior
         lc.OnPlayerLeave(pi);
 
@@ -246,8 +266,38 @@ public class PlayerManager : MonoBehaviour
 
     public void FindNextAvailableColor(int leftRight)
     {
-        
+
     }
+
+    //assigns a player to a team
+    public void SetTeam(PlayerData player, Team team)
+    {
+        //leave current team
+        LeaveTeam(player);
+
+        //join new team
+        JoinTeam(player, team);
+    }
+
+    //adds player to team
+    void JoinTeam(PlayerData player, Team team)
+    {
+        player.Team = team;
+        player.teamIdx = team.idx;
+        team.Players.Add(player);
+
+        Debug.Log("Player" + player.pi.playerIndex + " joined Team" + team.idx);
+    }
+
+    //leaves current teams
+    public void LeaveTeam(PlayerData player)
+    {
+        Debug.Log("Player" + player.pi.playerIndex + " left Team" + player.Team?.idx);
+        player.Team?.Players.Remove(player);
+        player.teamIdx = -1;
+        player.Team = null;
+    }
+
 
     
 

@@ -1,15 +1,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 //Important organizational level data for a single player
 public class PlayerData : MonoBehaviour
 {
     PlayerManager pm;
+    public PlayerInput pi; //use pi.playerIndex for true indexing!
 
-    [HideInInspector] public int trueIdx; //PlayerManager ID -i.e. order controller was connected
+    //[HideInInspector] public int trueIdx; //PlayerManager ID -i.e. order controller was connected
     [HideInInspector] public int inGameIdx = -1; //Player Number -by order of CSS joins: P1,P2, etc.
     [HideInInspector] public int teamIdx = -1; //currently assigned team;
+    [HideInInspector] public Team Team;
 
     [HideInInspector] public int colorIdx; //ID associated with color -used in PlayerManager color lookup
     [HideInInspector] public Color color; //equipped color
@@ -21,6 +24,7 @@ public class PlayerData : MonoBehaviour
     void Start()
     {
         pm = FindFirstObjectByType<PlayerManager>();
+        pi = GetComponent<PlayerInput>();
 
     }
 
