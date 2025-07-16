@@ -393,6 +393,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UIWindow: {fileID: 0}
+  isReady: 0
 --- !u!114 &-8555396865528252882
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -406,6 +407,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pi: {fileID: 8736686337939707414}
+  BodySprite: {fileID: 91940134732367498}
   inGameIdx: -1
   teamIdx: -1
   colorIdx: 0

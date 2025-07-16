@@ -17,6 +17,7 @@ public class PlayerManager : MonoBehaviour
     PlayerInputManager pim;
     [SerializeField] GameObject PlayerPrefab; //player obj prefab
     public Color[] PlayerColors; //Array of equippable player colors
+    public List<int> TakenColors; //list of taken colors
 
     [HideInInspector] public LevelController lc; //current scene's LevelController (updated by LC)
 
@@ -28,6 +29,7 @@ public class PlayerManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        TakenColors = new List<int>();
 
 
 
@@ -205,6 +207,9 @@ public class PlayerManager : MonoBehaviour
                     //assign new device to first deviceless PlayerInput
                     InputUser.PerformPairingWithDevice(device, p.user);
 
+                    //run player joining protocols
+                    OnPlayerJoin(p);
+
 
                     //exit
                     return;
@@ -244,6 +249,9 @@ public class PlayerManager : MonoBehaviour
         //assign to first empty team
         SetTeam(pi.GetComponent<PlayerData>(), Teams.Find(t => t.Players.Count == 0));
 
+        //assign first available color
+        SetColor(pi.GetComponent<PlayerData>(), FindNextAvailableColor(0, 1));
+
         //run LevelController player join behavior
         lc.OnPlayerJoin(pi);
     }
@@ -264,9 +272,50 @@ public class PlayerManager : MonoBehaviour
 
     }
 
-    public void FindNextAvailableColor(int leftRight)
+    //finds next available player color in direction -1=left 1=right
+    //starting from colorID
+    public int FindNextAvailableColor(int colorID, int leftRight)
     {
+        while (TakenColors.Contains(colorID))
+        {
+            //move left/right
+            colorID += leftRight;
 
+            //wrap around
+            if (colorID > PlayerColors.Count() - 1)
+            {
+                colorID = 0;
+            }
+            else if (colorID < 0)
+            {
+                colorID = PlayerColors.Count() - 1;
+            }
+        }
+
+        return colorID;
+    }
+
+    public void SetColor(PlayerData player, int colorID)
+    {
+        if (colorID > PlayerColors.Count() - 1)
+        {
+            Debug.Log("ERROR: colorID is out of range!!");
+            return;
+        }
+
+        //free up old color
+        TakenColors.Remove(player.colorIdx);
+
+        //set player's color
+        player.colorIdx = colorID;
+        player.color = PlayerColors[colorID];
+
+        //lock down new color
+        TakenColors.Add(colorID);
+
+
+        //set player visuals
+        player.SetColor();
     }
 
     //assigns a player to a team

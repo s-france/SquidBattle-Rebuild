@@ -6,14 +6,19 @@ using UnityEngine.InputSystem;
 
 public class CSSPlayerController : MonoBehaviour
 {
+    PlayerManager pm;
     PlayerData data;
     CSSLevelController lc;
 
     [HideInInspector] public CSSWindowDisplay UIWindow;
 
+
+    [HideInInspector] public bool isReady = false; //ReadyUp state
+
     // Start is called before the first frame update
     void Start()
     {
+        pm = FindFirstObjectByType<PlayerManager>();
         lc = FindFirstObjectByType<CSSLevelController>();
         data = GetComponent<PlayerData>();
 
@@ -39,11 +44,21 @@ public class CSSPlayerController : MonoBehaviour
 
     public void OnLeftL(InputAction.CallbackContext ctx)
     {
+        if (ctx.performed && !isReady)
+        {
+            pm.SetColor(data, pm.FindNextAvailableColor(data.colorIdx, -1));
+
+        }
 
     }
 
     public void OnRightR(InputAction.CallbackContext ctx)
     {
+        if (ctx.performed && !isReady)
+        {
+            pm.SetColor(data, pm.FindNextAvailableColor(data.colorIdx, 1));
+
+        }
 
     }
 
