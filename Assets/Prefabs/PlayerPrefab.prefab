@@ -120,6 +120,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 854338050657813883}
+        m_TargetAssemblyTypeName: CSSPlayerController, Assembly-CSharp
+        m_MethodName: UnassignUIWindow
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   m_DeviceRegainedEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -380,6 +392,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9de1b5e48b3534f4bb4157f019dab015, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  UIWindow: {fileID: 0}
 --- !u!114 &-8555396865528252882
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -392,3 +405,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef44763e408c3c7499f7ff0fdacd68a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  trueIdx: 0
+  inGameIdx: -1
+  teamIdx: -1
+  colorIdx: 0
+  color: {r: 0, g: 0, b: 0, a: 0}

@@ -5,6 +5,8 @@ using UnityEngine;
 //Important organizational level data for a single player
 public class PlayerData : MonoBehaviour
 {
+    PlayerManager pm;
+
     [HideInInspector] public int trueIdx; //PlayerManager ID -i.e. order controller was connected
     [HideInInspector] public int inGameIdx = -1; //Player Number -by order of CSS joins: P1,P2, etc.
     [HideInInspector] public int teamIdx = -1; //currently assigned team;
@@ -18,6 +20,7 @@ public class PlayerData : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        pm = FindFirstObjectByType<PlayerManager>();
 
     }
 

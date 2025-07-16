@@ -54,7 +54,7 @@ public class CSSPlayerController : MonoBehaviour
 
     public void OnRightTrig(InputAction.CallbackContext ctx)
     {
-
+        
     }
 
     public void OnHoldBack(InputAction.CallbackContext ctx)
@@ -64,14 +64,20 @@ public class CSSPlayerController : MonoBehaviour
 
     public void OnJoinLR(InputAction.CallbackContext ctx)
     {
-        foreach (CSSWindowDisplay window in lc.PlayerWindows)
+        if (ctx.performed && UIWindow == null)
         {
-            if (window.playerIdx == -1)
+            foreach (CSSWindowDisplay window in lc.PlayerWindows)
             {
-                AssignUIWindow(window);
-                break;
+                if (window.playerIdx == -1)
+                {
+                    AssignUIWindow(window);
+                    break;
+                }
             }
         }
+
+
+        
 
 
     }
@@ -82,7 +88,7 @@ public class CSSPlayerController : MonoBehaviour
     }
 
 
-    
+
 
     //assigns this player to a CSS window
     public void AssignUIWindow(CSSWindowDisplay window)
@@ -91,6 +97,8 @@ public class CSSPlayerController : MonoBehaviour
 
         window.playerIdx = data.trueIdx;
         data.inGameIdx = Array.IndexOf(lc.PlayerWindows, window);
+
+        window.JoinPlayer();
     }
 
     //unassigns UI window - unjoins player from CSS

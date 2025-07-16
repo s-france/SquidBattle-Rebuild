@@ -27,7 +27,7 @@ public class PlayerManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
 
 
 
@@ -72,11 +72,11 @@ public class PlayerManager : MonoBehaviour
                             Debug.Log(device.path);
                             Debug.Log(device.ToString());
 
-                            
+
 
 
                             AssignNewDeviceToPlayer(device);
-                            
+
                             break;
 
                         case InputDeviceChange.Removed:
@@ -121,7 +121,7 @@ public class PlayerManager : MonoBehaviour
             foreach (Gamepad device in Gamepad.all)
             {
                 AssignNewDeviceToPlayer(device);
-                
+
             }
 
 
@@ -145,7 +145,7 @@ public class PlayerManager : MonoBehaviour
     {
         if (device is Gamepad && device.added)
         {
-            
+
             // We execute this code on `playerInput.onControlsChanged`
             if (device is UnityEngine.InputSystem.Switch.SwitchProControllerHID)
             {
@@ -157,12 +157,12 @@ public class PlayerManager : MonoBehaviour
                         InputSystem.DisableDevice(item);
 
                         //ADD THIS: delete item XInput PlayerPrefab + user if user is created
-                        
+
 
                     }
                 }
             }
-            
+
 
             // We execute this code on `playerInput.onControlsChanged`
             if (device is UnityEngine.InputSystem.XInput.XInputController)
@@ -180,7 +180,7 @@ public class PlayerManager : MonoBehaviour
             }
 
 
-            
+
             foreach (PlayerInput p in PlayerList)
             {
                 if (p.hasMissingRequiredDevices)
@@ -228,7 +228,7 @@ public class PlayerManager : MonoBehaviour
         PlayerList.Add(pi);
 
         //run LevelController player join behavior
-        lc.OnPLayerJoin(pi);
+        lc.OnPlayerJoin(pi);
     }
 
     //called when player leave event triggered
@@ -242,6 +242,11 @@ public class PlayerManager : MonoBehaviour
         //trigger lc player leave behavior
         lc.OnPlayerLeave(pi);
 
+    }
+
+    public void FindNextAvailableColor(int leftRight)
+    {
+        
     }
 
     

@@ -35,6 +35,16 @@ public class CSSWindowDisplay : MonoBehaviour
 
     }
 
+    public void JoinPlayer()
+    {
+        //hide join icons
+        JoinLR.gameObject.SetActive(false);
+
+        //show player interaction icons
+        SwitchLR.gameObject.SetActive(true);
+        PlayerIcon.gameObject.SetActive(true);
+    }
+
 
     //resets display window to "waiting for player join" state
     public void LeavePlayer()
@@ -47,6 +57,6 @@ public class CSSWindowDisplay : MonoBehaviour
         PlayerIcon.gameObject.SetActive(false);
 
         //reset idx
-        playerIdx = -1;
+        //playerIdx = -1;
     }
 }

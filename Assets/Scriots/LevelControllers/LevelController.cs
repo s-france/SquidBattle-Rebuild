@@ -52,7 +52,7 @@ public class LevelController : MonoBehaviour
 
     }
 
-    public virtual void OnPLayerJoin(PlayerInput pi)
+    public virtual void OnPlayerJoin(PlayerInput pi)
     {
 
     }

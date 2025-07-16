@@ -12,7 +12,7 @@ public class CSSLevelController : MenuLevelController
     {
         base.Start();
 
-        PlayerWindows = FindObjectsByType<CSSWindowDisplay>(FindObjectsSortMode.None);
+        //PlayerWindows = FindObjectsByType<CSSWindowDisplay>(FindObjectsSortMode.None);
 
 
         foreach (PlayerInput p in pm.PlayerList)
@@ -40,5 +40,10 @@ public class CSSLevelController : MenuLevelController
         pi.GetComponent<CSSPlayerController>().UnassignUIWindow();
 
 
+    }
+
+    public override void OnPlayerJoin(PlayerInput pi)
+    {
+        pi.SwitchCurrentActionMap("CharacterSelect");
     }
 }
