@@ -43,6 +43,8 @@ public class PlayerData : MonoBehaviour
     {
         BodySprite.color = pm.PlayerColors[colorIdx];
 
+        
+
 
     }
 }
