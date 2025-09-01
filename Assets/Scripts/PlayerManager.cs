@@ -16,8 +16,10 @@ public class PlayerManager : MonoBehaviour
 
     PlayerInputManager pim;
     [SerializeField] GameObject PlayerPrefab; //player obj prefab
-    public Color[] PlayerColors; //Array of equippable player colors
-    public List<int> TakenColors; //list of taken colors
+
+    public ColorSet PlayerColors;
+    
+    [HideInInspector] public List<int> TakenColors; //list of taken colors
 
     [HideInInspector] public LevelController lc; //current scene's LevelController (updated by LC)
 
@@ -238,19 +240,24 @@ public class PlayerManager : MonoBehaviour
     {
         Debug.Log("Player " + pi.playerIndex + " Joined!");
 
+        PlayerData player = pi.GetComponent<PlayerData>();
+
+        player.pm = this;
+
         //set PlayerManager as player obj's parent
         pi.transform.parent = transform;
 
         //add new player to PlayerList
         PlayerList.Add(pi);
 
+
         
 
         //assign to first empty team
-        SetTeam(pi.GetComponent<PlayerData>(), Teams.Find(t => t.Players.Count == 0));
+        SetTeam(player, Teams.Find(t => t.Players.Count == 0));
 
         //assign first available color
-        SetColor(pi.GetComponent<PlayerData>(), FindNextAvailableColor(0, 1));
+        SetColor(player, FindNextAvailableColor(pi.playerIndex, 1));
 
         //run LevelController player join behavior
         lc.OnPlayerJoin(pi);
@@ -282,13 +289,13 @@ public class PlayerManager : MonoBehaviour
             colorID += leftRight;
 
             //wrap around
-            if (colorID > PlayerColors.Count() - 1)
+            if (colorID > PlayerColors.Colors.Count() - 1)
             {
                 colorID = 0;
             }
             else if (colorID < 0)
             {
-                colorID = PlayerColors.Count() - 1;
+                colorID = PlayerColors.Colors.Count() - 1;
             }
         }
 
@@ -297,7 +304,7 @@ public class PlayerManager : MonoBehaviour
 
     public void SetColor(PlayerData player, int colorID)
     {
-        if (colorID > PlayerColors.Count() - 1)
+        if (colorID > PlayerColors.Colors.Count() - 1)
         {
             Debug.Log("ERROR: colorID is out of range!!");
             return;
@@ -308,7 +315,7 @@ public class PlayerManager : MonoBehaviour
 
         //set player's color
         player.colorIdx = colorID;
-        player.color = PlayerColors[colorID];
+        player.color = PlayerColors.Colors[colorID];
 
         //lock down new color
         TakenColors.Add(colorID);

@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 //Important organizational level data for a single player
 public class PlayerData : MonoBehaviour
 {
-    PlayerManager pm;
+    [HideInInspector] public PlayerManager pm;
     public PlayerInput pi; //use pi.playerIndex for true indexing!
 
     public SpriteRenderer BodySprite;
@@ -41,10 +41,7 @@ public class PlayerData : MonoBehaviour
     //sets all player assets to current color
     public void SetColor()
     {
-        BodySprite.color = pm.PlayerColors[colorIdx];
-
-        
-
+        BodySprite.color = pm.PlayerColors.Colors[colorIdx];
 
     }
 }

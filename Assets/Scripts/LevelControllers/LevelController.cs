@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 public class LevelController : MonoBehaviour
 {
-    public int levelType;
+    public string levelName;
     [HideInInspector] public PlayerManager pm;
 
     // Start is called before the first frame update
@@ -59,7 +59,12 @@ public class LevelController : MonoBehaviour
 
     public virtual void OnPlayerLeave(PlayerInput pi)
     {
-        
+
+    }
+
+    public virtual void SpawnPlayer(int idx)
+    {
+
     }
 
     

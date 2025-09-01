@@ -3,17 +3,29 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+//🐙
 public class PlayerController : MonoBehaviour
 {
     PlayerManager pm;
+
+    PhysicsObj phys;
     PlayerInput pi;
     PlayerData data;
+
+    //player state tracking bools
+    bool charging = false;
+    bool specialCharging = false;
+    bool isKnockback = false;
+
+    //
 
 
     // Start is called before the first frame update
     void Start()
     {
         pm = FindFirstObjectByType<PlayerManager>();
+
+        phys = GetComponent<PhysicsObj>();
         pi = GetComponent<PlayerInput>();
         data = GetComponent<PlayerData>();
 
@@ -21,6 +33,11 @@ public class PlayerController : MonoBehaviour
 
     // Update is called once per frame
     void Update()
+    {
+
+    }
+
+    void FixedUpdate()
     {
 
     }
@@ -39,7 +56,14 @@ public class PlayerController : MonoBehaviour
     {
         if (ctx.performed)
         {
+            charging = true;
+
             Debug.Log("Player" + pi.playerIndex + " pressed A");
+        }
+        else if (ctx.canceled)
+        {
+            charging = false;
+
         }
 
     }
@@ -58,10 +82,10 @@ public class PlayerController : MonoBehaviour
     {
 
     }
-    
+
     public void OnRSelectRight(InputAction.CallbackContext ctx)
     {
-        
+
     }
 
 
