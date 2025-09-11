@@ -8,7 +8,7 @@ public class PhysicsStats : ScriptableObject
 {
     public AnimationCurve MoveCurve;
 
-    public float maxMoveForce;
+    //public float maxMoveForce; not in use...
 
     public AnimationCurve moveSpeedCurve;
 
