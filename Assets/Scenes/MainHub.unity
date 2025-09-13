@@ -340,7 +340,7 @@ Transform:
   m_GameObject: {fileID: 523251040}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -3.47, y: 1.58, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -362,7 +362,7 @@ CircleCollider2D:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_LayerOverridePriority: 0
   m_ForceSendLayers:
     serializedVersion: 2
@@ -421,6 +421,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa940aaf03b1949f2b845252db80f7b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: 0}
+  triggerCol: {fileID: 0}
   stats: {fileID: 11400000, guid: c118b9d2a6d4c4f62b875a7997ae1070, type: 2}
   SolidColission:
     m_PersistentCalls:
@@ -430,6 +432,10 @@ MonoBehaviour:
   isHitstop: 0
   isInvincible: 0
   isIntangible: 0
+  prevPos: []
+  moveSpeed: 0
+  glideSpeed: 0
+  glideRate: 0
 --- !u!58 &523251046
 CircleCollider2D:
   m_ObjectHideFlags: 0

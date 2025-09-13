@@ -28,7 +28,7 @@ public class PlayerAnimation : MonoBehaviour
         }
 
         //rotate
-        if (!pc.isKnockback && !pc.phys.isMoving)
+        if (!pc.phys.isKnockback && !pc.phys.isMoving)
         {
             RotatePlayer(pc.aim_move);
         }

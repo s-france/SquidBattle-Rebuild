@@ -202,6 +202,83 @@ MonoBehaviour:
   maxMoveTime: 0.28
   maxMovePower: 2
   pushOutPower: 0.3
+  armorCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.3
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.25601745
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  maxMoveArmor: 0.3
+  maxPassiveArmor: 0
+  directnessKBCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0.15353703
+      outSlope: 0.15353703
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.17804556
+    - serializedVersion: 3
+      time: 0.5
+      value: 0.5
+      inSlope: 2.3865564
+      outSlope: 2.3865564
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.098468244
+      outWeight: 0.10940926
+    - serializedVersion: 3
+      time: 0.85
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.6790663
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   wallTechFrameWindow: 3
   parryFrameWindow: 5
   maxChargeTime: 1.5

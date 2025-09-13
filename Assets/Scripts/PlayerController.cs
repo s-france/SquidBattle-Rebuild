@@ -30,7 +30,6 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public float chargeTime = 0;
     [HideInInspector] public bool specialCharging = false;
     [HideInInspector] public float specialChargeTime = 0;
-    [HideInInspector] public bool isKnockback = false;
 
 
     //
@@ -82,7 +81,7 @@ public class PlayerController : MonoBehaviour
         {
             chargePressed = false;
 
-            if (!isKnockback && !phys.isHitstop)
+            if (!phys.isKnockback && !phys.isHitstop)
             {
                 phys.ApplyMove(chargeTime, aim_move);
             }
@@ -122,7 +121,7 @@ public class PlayerController : MonoBehaviour
     //tracks player charging //runs in FixedUpdate()
     void ChargeTick()
     {
-        if (chargePressed && !isKnockback && !phys.isMoving)
+        if (chargePressed && !phys.isKnockback && !phys.isMoving)
         {
             //if (!isKnockback && !phys.isHitstop /*&& !isRewind*/ )
             //{
@@ -154,7 +153,14 @@ public class PlayerController : MonoBehaviour
     {
 
         //exit if not moving or no directional input (no DI)
-        if ((!phys.isMoving && !phys.isGliding) || input_move.magnitude == 0) { return; }
+        if ((!phys.isMoving && !phys.isGliding) || input_move.magnitude == 0)
+        {
+            //safety reset
+            phys.glideSpeed = phys.moveSpeed;
+            phys.glideRate = 1;
+
+            return;
+        }
 
         //DI calc vectors
         Vector2 forwardDI = Vector2.zero;
@@ -165,8 +171,9 @@ public class PlayerController : MonoBehaviour
         lateralDI = Vector2.Perpendicular(phys.rb.velocity).normalized * Mathf.Sin(Mathf.Deg2Rad * Vector2.SignedAngle(phys.rb.velocity, input_move));
         forwardDI = phys.rb.velocity.normalized * Mathf.Cos(Mathf.Deg2Rad * Vector2.SignedAngle(phys.rb.velocity, input_move));
 
+
         //knockback DI modifiers
-        if (isKnockback)
+        if (phys.isKnockback)
         {
             DIMod = 1.1f * stats.DIStrength * ((1.1f * stats.lateralDIStrength * lateralDI) + (stats.forwardDIStrength * forwardDI));
         }
@@ -220,7 +227,7 @@ public class PlayerController : MonoBehaviour
             if (lateralDI != Vector2.zero)
             {
                 //extend glide duration
-                phys.glideRate -= (lateralDI.magnitude * .12f);
+                phys.glideRate -= (lateralDI.magnitude * .1f); //og val: .12
             }
 
             //charging glide modifiers
@@ -229,7 +236,7 @@ public class PlayerController : MonoBehaviour
                 //slowmomentum
                 phys.glideSpeed = .8f * phys.moveSpeed;
                 //extend glide duration to compensate
-                phys.glideRate *= .7f;
+                phys.glideRate *= .8f;
             }
         }
         else if (phys.isMoving)
@@ -244,9 +251,8 @@ public class PlayerController : MonoBehaviour
 
         if (DIMod.magnitude != 0) //band-aid
         {
-            //apply DI to physObj:
-            //TEST THIS!!!!
-            phys.rb.velocity *= (phys.rb.velocity.normalized + DIMod).normalized;
+            //apply DI to physObj: //buss
+            phys.rb.velocity = phys.rb.velocity.magnitude * (phys.rb.velocity.normalized + DIMod).normalized;
         }
 
 
@@ -255,6 +261,7 @@ public class PlayerController : MonoBehaviour
 
     public void ApplyKnockback(PhysicsObj otherObj)
     {
+        //cancel charge
 
 
     }

@@ -20,15 +20,23 @@ public class PhysicsObj : MonoBehaviour
 
 
     List<Collider2D> Collisions; //list of all colliders currently touching triggerCol
-    List<Collider2D> IntangibleColliders; //list of colliders to ignore in collision processing
+
+
+    //peer priority tables //i.e. objs to treat as special cases in collisions
+    [HideInInspector] public Dictionary<PhysicsObj, float> OverpowerPeerPrioTable; //objs to overpower in KB interactions
+    [HideInInspector] public Dictionary<PhysicsObj, float> IntangiblePeerPrioTable; //objs to ignore in collision
+    //
 
     //state tracking vars
     [HideInInspector] public bool isMoving;
+    [HideInInspector] public bool isKnockback = false;
     [HideInInspector] public bool isGliding;
     [HideInInspector] public bool isHitstop;
     [HideInInspector] public bool isInvincible;
     [HideInInspector] public bool isIntangible;
     [HideInInspector] public List<Vector2> prevPos; //list of previous positions (used in collision pos correction)
+    [HideInInspector] public Vector2 storedVelocity; //stored true velocity carried through hitstop
+
     //
 
     //current movement state numbers
@@ -43,13 +51,17 @@ public class PhysicsObj : MonoBehaviour
 
     //glide modifiers
     [HideInInspector] public float glideSpeed = 0;
-    [HideInInspector] public float glideRate = 0;
+    [HideInInspector] public float glideRate = 1;
     //
 
     float glideTime = 0;
     float initialMovePower = 0;
     float glideTimer = 0;
     //
+
+    //armor system
+    [HideInInspector] public float passiveArmor = 0; //actual current passive armor used in KB calc
+    [HideInInspector] public float moveArmor = 0; //current moveArmor to be used in KB calcs
 
 
     // Start is called before the first frame update
@@ -64,7 +76,10 @@ public class PhysicsObj : MonoBehaviour
 
         //init collisions lists
         Collisions = new List<Collider2D>();
-        IntangibleColliders = new List<Collider2D>();
+
+        //init PeerPriority tables
+        OverpowerPeerPrioTable = new Dictionary<PhysicsObj, float>();
+        IntangiblePeerPrioTable = new Dictionary<PhysicsObj, float>();
 
         //init prevPos list
         prevPos = new List<Vector2>(3);
@@ -78,6 +93,8 @@ public class PhysicsObj : MonoBehaviour
     void FixedUpdate()
     {
         TrackStateTick();
+        PeerPriorityTick();
+        ArmorTick();
 
         MovementTick();
 
@@ -100,10 +117,14 @@ public class PhysicsObj : MonoBehaviour
             //increment timer
             moveTimer += Time.deltaTime;
 
-        } else if (glideTimer < glideTime) //Gliding
+        }
+        else if (glideTimer < glideTime) //Gliding
         {
             isMoving = false;
+            isKnockback = false;
             isGliding = true;
+
+            moveArmor = 0;
 
             //scale power down based on movecurve progress
             movePower = stats.MoveCurve.Evaluate(1 + (glideTimer / glideTime)) * initialMovePower;
@@ -113,12 +134,14 @@ public class PhysicsObj : MonoBehaviour
             glideTimer += (Time.fixedDeltaTime * glideRate);
 
 
-        } else //done no movement
+        }
+        else //done no movement
         {
             isMoving = false;
+            isKnockback = false;
             isGliding = false;
 
-            //moveArmor = 0;
+            moveArmor = 0;
 
             glideTime = moveTime = moveSpeed = 0;
 
@@ -149,18 +172,36 @@ public class PhysicsObj : MonoBehaviour
 
     }
 
+    //tick armor stats
+    //runs in FixedUpdate()
+    void ArmorTick()
+    {
+        if(passiveArmor < stats.maxPassiveArmor)
+        {
+            passiveArmor = Mathf.Clamp(passiveArmor + Time.fixedDeltaTime, 0, stats.maxPassiveArmor);
+        } else
+        {
+            passiveArmor = stats.maxPassiveArmor;
+        }
+
+    }
+
     //applys new move - sets movement variables
     public void ApplyMove(float moveForce, Vector2 direction) // Assume moveForce is always between 0-1
     {
 
         moveTime = stats.maxMoveTime * stats.moveTimeCurve.Evaluate(moveForce);
         movePower = initialMovePower = stats.maxMovePower * stats.movePowerCurve.Evaluate(moveForce);
-        moveSpeed = stats.maxMoveSpeed * stats.moveSpeedCurve.Evaluate(moveForce);
+        moveSpeed = glideSpeed = stats.maxMoveSpeed * stats.moveSpeedCurve.Evaluate(moveForce);
+
+        glideRate = 1;
 
         glideTime = 2.7f * Mathf.Clamp(moveTime, 0, stats.moveTimeCurve.Evaluate(1.2f));
 
         moveTimer = 0;
         glideTimer = 0;
+
+        moveArmor = stats.maxMoveArmor * stats.armorCurve.Evaluate(moveForce);
 
         rb.velocity = direction.normalized;
     }
@@ -168,11 +209,6 @@ public class PhysicsObj : MonoBehaviour
 
     public void OnTriggerEnter2D(Collider2D col)
     {
-        //exit if intangible
-        if (IntangibleColliders.Contains(col))
-        {
-            return;
-        }
 
         //update collisions list
         if (!Collisions.Contains(col))
@@ -182,6 +218,15 @@ public class PhysicsObj : MonoBehaviour
             //col is another PhysicsObj triggerHB
             if (col.isTrigger && col.TryGetComponent<PhysicsObj>(out PhysicsObj otherObj))
             {
+                //exit if peer intangible
+                if (IntangiblePeerPrioTable.ContainsKey(otherObj) && IntangiblePeerPrioTable[otherObj] > 0)
+                {
+                    return;
+                }
+
+
+
+
                 //physics process collision
 
                 //positional correction
@@ -281,10 +326,139 @@ public class PhysicsObj : MonoBehaviour
 
     public void ApplyKnockback(PhysicsObj otherObj)
     {
-        //make intangible
-        
-        //
+        StartCoroutine(Knockback(otherObj));
+    }
 
+    public IEnumerator Knockback(PhysicsObj otherObj)
+    {
+        //make peer intangible
+        SetPeerPriority(IntangiblePeerPrioTable, otherObj, 1);
+
+        //true velocity at impact
+        Vector2 velocity = isHitstop ? storedVelocity : rb.velocity;
+        Vector2 otherVelocity = otherObj.isHitstop ? otherObj.storedVelocity : otherObj.rb.velocity;
+
+        //move priorities
+        int mPrio = CalcMovePrio(this);
+        int otherMPrio = CalcMovePrio(otherObj);
+        //difference in priority
+        int priorityDiff = mPrio - otherMPrio;
+
+        //difference in powers
+        float powerDiff = movePower - otherObj.movePower;
+        //power ratio
+        float powerRatio = movePower / otherObj.movePower;
+
+        //angle players are colliding:
+        //1 = moving straight at each other
+        //0 = moving in same direction
+        float directionDiff = Vector2.Angle(velocity, otherVelocity) / 180;
+
+        //relative positions
+        //vector pointing from player's position to otherPlayer's position i.e. relative position (direction only)
+        Vector2 posDiff = (otherObj.transform.position - transform.position).normalized;
+        //vector pointing from otherPlayer's position to this player's position
+        Vector2 otherPosDiff = (transform.position - otherObj.transform.position).normalized;
+
+
+        //how much of a "direct hit" it is
+        //1 = direct hit
+        //0 = indirect hit
+        //animationCurve used to level out "almost direct hits" and keep value > 0
+        float directness = 0;
+        if (velocity != Vector2.zero)
+        {
+            directness = stats.directnessKBCurve.Evaluate(1 - (Vector2.Angle(posDiff, velocity) / 180));
+        }
+
+        float otherDirectness = 0;
+        if (otherVelocity != Vector2.zero)
+        {
+            otherDirectness = otherObj.stats.directnessKBCurve.Evaluate(1 - (Vector2.Angle(otherPosDiff, otherVelocity) / 180));
+        }
+
+        float directnessRatio = otherDirectness / directness;
+
+
+        //overall strength: takes directness and power into account
+        float strength = directness * movePower;
+        float otherStrength = otherDirectness * otherObj.movePower;
+
+        //armor calcs
+        //strength after subtracting armor mitigation
+        float armoredStrength = strength - (otherObj.passiveArmor + otherObj.moveArmor) + (passiveArmor + moveArmor);
+        float armoredOtherStrength = otherStrength - (passiveArmor + moveArmor) + (otherObj.passiveArmor + otherObj.moveArmor);
+        //new armor vals after subtracting impact strength
+        float armor = (passiveArmor + moveArmor) - otherStrength;
+        float otherArmor = (otherObj.passiveArmor + otherObj.moveArmor) - strength;
+
+        float strengthDiff = otherStrength - strength;
+        float strengthRatio = otherStrength / strength;
+
+
+
+
+        //calc hitstop
+        float hitstop = (strength > otherStrength) ? (strength / stats.maxMovePower) : (otherStrength / otherObj.stats.maxMovePower);
+
+
+        Vector2 impactDirection = velocity.normalized;
+        Vector2 otherImpactDirection = otherVelocity.normalized;
+
+        //calculate knockback direction
+        Vector2 direction;
+
+
+        //armor priority recalculations
+        //other player is armored
+        if (otherArmor > 0 && otherArmor > armor)
+        {
+            if (otherMPrio <= 1)
+            {
+                //deflected
+                mPrio = -1;
+            }
+            else
+            {
+                //overpowered
+                mPrio = 1;
+            }
+
+            //armor overpower
+        }
+        else if (armor > 0)
+        {
+            if (otherMPrio <= 1)
+            {
+
+            }
+            else
+            {
+                //overpower
+                mPrio = 4;
+            }
+        }
+
+
+
+        //apply impact hitstop
+        //ApplyHitStop(maxHitstop * hitstopCurve.Evaluate(hitstop), 1);
+
+
+        //wait one tick so both sides' KB calcs can finish
+        yield return new WaitForFixedUpdate();
+
+        //movearmor gets decreased permanently
+        float remainingAttack = moveArmor - otherStrength;
+        moveArmor = Mathf.Clamp(moveArmor - otherStrength, 0, 10000);
+
+        //passive armor gets decreased by any overflow Strength
+        if (moveArmor <= 0 && remainingAttack < 0)
+        {
+            passiveArmor = Mathf.Clamp(passiveArmor + remainingAttack, 0, 10000);
+        }
+        
+        
 
 
 
@@ -293,4 +467,85 @@ public class PhysicsObj : MonoBehaviour
 
 
     }
+
+
+    //calculcates movepriotiy
+    //0 = standing still
+    //1 = gliding
+    //2 = knockback
+    //3 = launch movement
+    int CalcMovePrio(PhysicsObj obj)
+    {
+        int mPrio = 0;
+
+        if (obj.isMoving)
+        {
+            mPrio = 3;
+            if (obj.isKnockback)
+            {
+                mPrio = 2;
+            }
+        }
+        else if (obj.isGliding)
+        {
+            mPrio = 1;
+        }
+
+        return mPrio;
+    }
+
+
+
+    public void SetPeerPriority(Dictionary<PhysicsObj, float> prioTable, PhysicsObj otherObj, float time)
+    {
+        if (prioTable.ContainsKey(otherObj))
+        {
+            prioTable[otherObj] = time;
+        }
+        else
+        {
+            prioTable.Add(otherObj, time);
+        }
+    }
+
+
+    //process Peer Priority updates (FixedUpdate)
+    void PeerPriorityTick()
+    {
+        if (!isHitstop)
+        {
+            //if done attacking reset overpower priority
+            if ((!isMoving || isKnockback) && !isHitstop)
+            {
+                //clear overpower prio table
+                for (int i = 0; i < OverpowerPeerPrioTable.Count; i++)
+                {
+                    OverpowerPeerPrioTable[OverpowerPeerPrioTable.Keys.ElementAt(i)] = 0;
+                }
+            }
+
+            //tick intangibility timers
+            for (int i = 0; i < IntangiblePeerPrioTable.Count; i++)
+            {
+                if (IntangiblePeerPrioTable[IntangiblePeerPrioTable.Keys.ElementAt(i)] > 0)
+                {
+                    IntangiblePeerPrioTable[IntangiblePeerPrioTable.Keys.ElementAt(i)] -= Time.fixedDeltaTime;
+                }
+
+                if (IntangiblePeerPrioTable[IntangiblePeerPrioTable.Keys.ElementAt(i)] < 0)
+                {
+                    IntangiblePeerPrioTable[IntangiblePeerPrioTable.Keys.ElementAt(i)] = 0;
+                }
+            }
+
+
+        }
+        
+
+
+
+
+    }
+    
+
 }

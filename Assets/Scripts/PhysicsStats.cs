@@ -24,6 +24,15 @@ public class PhysicsStats : ScriptableObject
 
     public float pushOutPower;
 
+    //armor
+    public AnimationCurve armorCurve;
+    public float maxMoveArmor; //move armor to apply on a move of maxMovePower
+    public float maxPassiveArmor; //max default passive armor
+
+
+    //knockback
+    public AnimationCurve directnessKBCurve;
+
 
 
 }
