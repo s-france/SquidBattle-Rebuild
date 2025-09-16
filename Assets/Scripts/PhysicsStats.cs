@@ -21,6 +21,7 @@ public class PhysicsStats : ScriptableObject
     public float maxMoveTime;
 
     public float maxMovePower;
+    public float knockbackMultiplier;
 
     public float pushOutPower;
 

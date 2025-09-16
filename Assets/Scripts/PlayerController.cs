@@ -83,7 +83,7 @@ public class PlayerController : MonoBehaviour
 
             if (!phys.isKnockback && !phys.isHitstop)
             {
-                phys.ApplyMove(chargeTime, aim_move);
+                phys.ApplyMove(false, Mathf.Clamp(chargeTime/stats.maxChargeTime, stats.minCharge, 1), aim_move);
             }
 
         }
@@ -262,6 +262,11 @@ public class PlayerController : MonoBehaviour
     public void ApplyKnockback(PhysicsObj otherObj)
     {
         //cancel charge
+
+
+        //check for parry -> override KB calcs
+
+        //assign killcredit
 
 
     }

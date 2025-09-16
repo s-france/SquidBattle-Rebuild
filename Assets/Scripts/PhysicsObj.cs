@@ -187,8 +187,9 @@ public class PhysicsObj : MonoBehaviour
     }
 
     //applys new move - sets movement variables
-    public void ApplyMove(float moveForce, Vector2 direction) // Assume moveForce is always between 0-1
+    public void ApplyMove(bool isKB, float moveForce, Vector2 direction) //player-inputted moveForce is always between 0-1  //KB force can exceed 1
     {
+        isKnockback = isKB;
 
         moveTime = stats.maxMoveTime * stats.moveTimeCurve.Evaluate(moveForce);
         movePower = initialMovePower = stats.maxMovePower * stats.movePowerCurve.Evaluate(moveForce);
@@ -201,9 +202,54 @@ public class PhysicsObj : MonoBehaviour
         moveTimer = 0;
         glideTimer = 0;
 
-        moveArmor = stats.maxMoveArmor * stats.armorCurve.Evaluate(moveForce);
-
+        //KB armor = 0
+        moveArmor = 0;
+        if (!isKB)
+        {
+            //apply armor if not KB
+            moveArmor = stats.maxMoveArmor * stats.armorCurve.Evaluate(moveForce);
+        }
+        
         rb.velocity = direction.normalized;
+    }
+
+
+    //modifies the current movement stats
+    //useful for movement impedance/extension/redirection
+    //directionMod => modifier applied to current rb direction
+    //durationMod => modifier applied to current moveTime + moveTimer vars
+    //powerMod => modifier applied to current movePower
+    void ModifyMove(bool isKB, Vector2 directionMod, float durationMod, float speedMod, float powerMod)
+    {
+        isKnockback = isKB;
+
+        //mod direction
+        Vector2 direction; 
+        
+        if(isHitstop)
+        {
+            direction = (directionMod + storedVelocity.normalized).normalized;
+            storedVelocity = storedVelocity.magnitude * direction;
+        } else
+        {
+            direction = (directionMod + rb.velocity.normalized).normalized;
+            rb.velocity = rb.velocity.magnitude * direction;
+        }
+        //
+
+        //mod timers
+        moveTime *= durationMod;
+        moveTimer *= durationMod;
+
+        //doing too much
+        //glideTime *= durationMod;
+        //glideTimer *= durationMod;
+
+        moveSpeed *= speedMod;
+
+        //mod power
+        movePower *= powerMod;
+        initialMovePower *= powerMod;
     }
 
 
@@ -332,7 +378,7 @@ public class PhysicsObj : MonoBehaviour
     public IEnumerator Knockback(PhysicsObj otherObj)
     {
         //make peer intangible
-        SetPeerPriority(IntangiblePeerPrioTable, otherObj, 1);
+        //SetPeerPriority(IntangiblePeerPrioTable, otherObj, 1);
 
         //true velocity at impact
         Vector2 velocity = isHitstop ? storedVelocity : rb.velocity;
@@ -358,7 +404,7 @@ public class PhysicsObj : MonoBehaviour
         //vector pointing from player's position to otherPlayer's position i.e. relative position (direction only)
         Vector2 posDiff = (otherObj.transform.position - transform.position).normalized;
         //vector pointing from otherPlayer's position to this player's position
-        Vector2 otherPosDiff = (transform.position - otherObj.transform.position).normalized;
+        Vector2 otherPosDiff = -posDiff;  //(transform.position - otherObj.transform.position).normalized;
 
 
         //how much of a "direct hit" it is
@@ -407,6 +453,9 @@ public class PhysicsObj : MonoBehaviour
 
         //calculate knockback direction
         Vector2 direction;
+        //direction when one player overpowers other               
+        direction = ((otherDirectness * otherImpactDirection) + (otherPosDiff * (1/otherDirectness))).normalized;
+
 
 
         //armor priority recalculations
@@ -444,9 +493,10 @@ public class PhysicsObj : MonoBehaviour
         //apply impact hitstop
         //ApplyHitStop(maxHitstop * hitstopCurve.Evaluate(hitstop), 1);
 
-
+        /////
         //wait one tick so both sides' KB calcs can finish
         yield return new WaitForFixedUpdate();
+        /////
 
         //movearmor gets decreased permanently
         float remainingAttack = moveArmor - otherStrength;
@@ -457,13 +507,286 @@ public class PhysicsObj : MonoBehaviour
         {
             passiveArmor = Mathf.Clamp(passiveArmor + remainingAttack, 0, 10000);
         }
+
+
+
+        //KB calc vars
+        float impedanceFactor;
+        Vector2 directionMod;
+
+        //first case
+        //if this player overpowers otherPlayer
+        if (OverpowerPeerPrioTable.ContainsKey(otherObj) && OverpowerPeerPrioTable[otherObj] > 0)
+        {
+            //overpower "barrel through"
+            //impedance based on otherStrength
+
+            //give this player intangible priority from otherPlayer
+            //8 ticks of intangibility
+            SetPeerPriority(IntangiblePeerPrioTable, otherObj, 8 * Time.fixedDeltaTime);
+
+            //give this player overpower priority over otherPlayer
+            SetPeerPriority(OverpowerPeerPrioTable, otherObj, 6 * Time.fixedDeltaTime);
+
+            //alter travel distance
+            impedanceFactor = 1 - Mathf.Clamp(1 * otherStrength, .1f, 1);
+
+            //alter direction
+            //factors: otherPosDiff, otherRB direction, 
+            directionMod = ((2 * otherPosDiff.normalized) + (5 * otherVelocity.normalized)).normalized * Mathf.Clamp((3 * otherStrength), .4f, 1);
+
+            ModifyMove(false, directionMod, impedanceFactor, impedanceFactor, .9f);
+
+
+            yield break;
+        }
+
+        //idk what this means but it's probably important...
+        //trying this
+        //sort of works, needs tuning (too much KB mitigation)
+        otherStrength = .5f * (otherStrength + armoredOtherStrength);
+        strength = .5f * (strength + armoredStrength);
         
-        
+        switch (mPrio)
+        {
+            case -1: //armor deflect
+                
+                //give this player intangible priority from otherPlayer
+                //EDIT THIS: int constant = invol frame data
+                //IntangiblePeerPrioTable[otherPC] = 8 * Time.fixedDeltaTime;
+                SetPeerPriority(IntangiblePeerPrioTable, otherObj, 8 * Time.fixedDeltaTime);
+
+                //currently in hitstop, use -storedvelocity to cancel out current direction
+                directionMod = (Vector2.Reflect(storedVelocity, otherPosDiff) * 200);
+
+                ModifyMove(true, directionMod, 1.1f, .95f, .8f);
+
+                break;
+            case 0: //standing still
+                if(otherMPrio <= 1) //other standing still / gliding
+                {
+                    //ADD THIS:
+                    //weak gliding KB nudge
+                    //use both glidePowers in calc
+
+                    ApplyMove(true, stats.knockbackMultiplier * otherStrength, direction);
+
+                } else if(otherMPrio == 2) //other being KB launched
+                {
+                    //use other player's stats for KB
+                    direction = ((otherDirectness * otherImpactDirection) + (otherPosDiff * (1/otherDirectness))).normalized;
+
+
+                    //powerful attack KB
+                    ApplyMove(true, stats.knockbackMultiplier * otherStrength, direction);
+                } else if(otherMPrio >= 3) //other moving attacking
+                {
+                    //give this player intangible priority from otherPlayer
+                    //EDIT THIS: int constant = invol frame data
+                    //IntangiblePeerPrioTable[otherPC] = 8 * Time.fixedDeltaTime;
+                    SetPeerPriority(IntangiblePeerPrioTable, otherObj, 8 * Time.fixedDeltaTime);
+
+
+                    //use other player's stats for KB
+                    direction = ((otherDirectness * otherImpactDirection) + (otherPosDiff * (1/otherDirectness))).normalized;
+
+                    //TWEAK THIS - calc should be more biased to otherPlayer
+                    //powerful attack KB
+                    ApplyMove(true, stats.knockbackMultiplier * otherStrength, direction);
+                }
+
+                break;
+            case 1: //gliding
+                if (otherMPrio <= 1) //standing still or gliding
+                {
+                    //ADD THIS:
+                    //weak gliding KB nudge
+                    //use both glidePowers in calc
+
+                    ApplyMove(true, stats.knockbackMultiplier * otherStrength, direction);
+
+                }
+                else if (otherMPrio == 2)
+                {
+                    //use other player's stats for KB
+                    direction = ((otherDirectness * otherImpactDirection) + (otherPosDiff * (1 / otherDirectness))).normalized;
+
+                    //powerful attack KB
+                    ApplyMove(true, stats.knockbackMultiplier * otherStrength, direction);
+
+                }
+                else if (otherMPrio >= 3)
+                {
+                    //give this player intangible priority from otherPlayer
+                    //EDIT THIS: int constant = invol frame data
+                    //IntangiblePeerPrioTable[otherPC] = 8 * Time.fixedDeltaTime;
+                    SetPeerPriority(IntangiblePeerPrioTable, otherObj, 8 * Time.fixedDeltaTime);
+
+                    //use other player's stats for KB
+                    direction = ((otherDirectness * otherImpactDirection) + (otherPosDiff * (1 / otherDirectness))).normalized;
+
+                    //powerful attack KB
+                    ApplyMove(true, stats.knockbackMultiplier * otherStrength, direction);
+                }
+
+                break;
+            case 2: //knockback launch
+                if(otherMPrio <= 1)
+                {
+                    //give this player intangible priority from otherPlayer
+                    //EDIT THIS: int constant = invol frame data
+                    //IntangiblePeerPrioTable[otherPC] = 8 * Time.fixedDeltaTime;
+                    SetPeerPriority(IntangiblePeerPrioTable, otherObj, 8 * Time.fixedDeltaTime);
+
+
+                    //max possible glidestrength = maxMovePower * .1
+                    Debug.Log("otherStrength = " + otherStrength);
+                    //alter travel distance
+                    impedanceFactor = 1 - Mathf.Clamp(1 * otherStrength, .1f, 1);
+
+                    //alter direction
+                    //factors: otherPosDiff, otherRB direction, 
+                    directionMod = ((2 * otherPosDiff.normalized) + (5 * otherVelocity.normalized)).normalized * Mathf.Clamp((3 * otherStrength), .4f, 1);
+
+                    ModifyMove(false, directionMod, 1.1f, .95f, 1);      
+
+
+                    //old "8ball" behaviour works for now
+                    //^^BRITISH???
+                    //ApplyMove(1, direction, knockbackMultiplier * otherStrength);
+
+                    //TRY THIS:
+                    //bounce off with slightly increased moveTime
+                    //(similar to wallbounce behavior)
+                    //ApplyMove(1,)
+                    //direction = (velocity.normalized) + Vector2.Reflect(velocity.normalized, otherPosDiff);
+                    //ModifyMove(1, direction, 1.1f, .95f, 1);
+
+                    //idk
+
+
+                } else if(otherMPrio == 2)
+                {
+                    //this should be good (same as 3,3 impact)
+                    direction = (((3 * Mathf.Clamp(otherDirectness, (otherObj.movePower/otherObj.stats.maxMovePower), 2)) * otherImpactDirection) + (otherPosDiff * (1/Mathf.Clamp(otherDirectness, (otherObj.movePower/otherObj.stats.maxMovePower), 2))) + (.7f * (1 - (Vector2.Angle(impactDirection, otherImpactDirection)/180)) * powerRatio * impactDirection)).normalized;
+
+                    //Equal KB exchange
+                    ApplyMove(true, stats.knockbackMultiplier * otherStrength, direction);
+
+                    //TRY THIS:
+                    //impede stronger player's KB more
+
+                } else if(otherMPrio >= 3)
+                {
+                    //TUNE THIS
+                    //use other player's direction in calc
+
+                    direction = (((3 * Mathf.Clamp(otherDirectness, (otherObj.movePower/otherObj.stats.maxMovePower), 2)) * otherImpactDirection) + (otherPosDiff * (1/Mathf.Clamp(otherDirectness, (otherObj.movePower/otherObj.stats.maxMovePower), 2))) + (.7f * (1 - (Vector2.Angle(impactDirection, otherImpactDirection)/180)) * powerRatio * impactDirection)).normalized;
+
+                    //receive full KB
+                    ApplyMove(true, stats.knockbackMultiplier * otherStrength, direction);
+                }
+
+                break;
+            case 3: //moving launch
+                if(otherMPrio <= 1)
+                {
+                    //"barrel through"
+                    //impedance based on otherStrength
+
+                    //give this player intangible priority from otherPlayer
+                    //EDIT THIS: int constant = invol frame data
+                    //IntangiblePeerPrioTable[otherPC] = 8 * Time.fixedDeltaTime;
+                    SetPeerPriority(IntangiblePeerPrioTable, otherObj, 8 * Time.fixedDeltaTime);
+
+
+                    //give this player overpower priority over otherPlayer
+                    //EDIT THIS: int constant = overPower frame data
+                    //OverpowerPeerPrioTable[otherPC] = 6 * Time.fixedDeltaTime;
+                    SetPeerPriority(OverpowerPeerPrioTable, otherObj, 6 * Time.fixedDeltaTime);
+                  
+                    //alter travel distance
+                    impedanceFactor = 1 - Mathf.Clamp(1 * otherStrength, .1f, 1);
+
+                    //alter direction
+                    //factors: otherPosDiff, otherRB direction, 
+                    directionMod = ((2 * otherPosDiff.normalized) + (5 * otherVelocity.normalized)).normalized * Mathf.Clamp((3 * otherStrength), .4f, 1);
+
+                    ModifyMove(false, directionMod, impedanceFactor, impedanceFactor, .9f);                        
+
+                } else if(otherMPrio == 2)
+                {                    
+                    //ADD THIS
+                    //apply reduced knockback based on powerDiff
 
 
 
+                    //new direction calc
+                    //ADD THIS:
+                    //tweak (powerRatio * impactDirection vals)
+                    //to allow overpowering players in weak KB launch
+                    direction = (((3 * Mathf.Clamp(otherDirectness, (otherObj.movePower/otherObj.stats.maxMovePower), 2)) * otherImpactDirection) + (otherPosDiff * (1/Mathf.Clamp(otherDirectness, (otherObj.movePower/otherObj.stats.maxMovePower), 2))) + (.7f * (1 - (Vector2.Angle(impactDirection, otherImpactDirection)/180)) * powerRatio * impactDirection)).normalized;
 
 
+                    ApplyMove(true, stats.knockbackMultiplier * otherStrength, direction);
+
+                } else if(otherMPrio >= 3)
+                {
+                    //ADD THIS: update strength calc
+                    //less weight on otherdirectness
+                    //add weight from (1/otherDirectness) * this player's moveTimer/moveTime
+                    
+                    
+                    //new direction calc
+                    //GOOD:
+                    direction = (((3 * Mathf.Clamp(otherDirectness, (otherObj.movePower/otherObj.stats.maxMovePower), 2)) * otherImpactDirection) + (otherPosDiff * (1/Mathf.Clamp(otherDirectness, (otherObj.movePower/otherObj.stats.maxMovePower), 2))) + (.7f * (1 - (Vector2.Angle(impactDirection, otherImpactDirection)/180)) * powerRatio * impactDirection)).normalized;
+                    //DONE LFG
+
+                    //Equal KB exchange
+                    ApplyMove(true, stats.knockbackMultiplier * otherStrength, direction);
+                }
+
+                break;
+
+            case 4: //armored
+
+                if(otherMPrio == -1)
+                {
+
+                } else
+                {
+                    //barrel through
+                    //"barrel through"
+                    //impedance based on otherStrength
+
+                    //give this player intangible priority from otherPlayer
+                    //EDIT THIS: int constant = invol frame data
+                    //IntangiblePeerPrioTable[otherPC] = 8 * Time.fixedDeltaTime;
+                    SetPeerPriority(IntangiblePeerPrioTable, otherObj, 8 * Time.fixedDeltaTime);
+
+                    //give this player overpower priority over otherPlayer
+                    //EDIT THIS: int constant = overPower frame data
+                    //OverpowerPeerPrioTable[otherPC] = 6 * Time.fixedDeltaTime;
+                    SetPeerPriority(OverpowerPeerPrioTable, otherObj, 6 * Time.fixedDeltaTime);
+                   
+                    //max possible glidestrength = maxMovePower * .1
+                    Debug.Log("otherStrength = " + otherStrength);
+                    //alter travel distance
+                    impedanceFactor = 1 - Mathf.Clamp(.3f * otherStrength, .2f, 1);
+
+                    //alter direction
+                    //factors: otherPosDiff, otherRB direction, 
+                    directionMod = ((2 * otherPosDiff.normalized) + (4 * otherVelocity.normalized)).normalized * Mathf.Clamp((.5f * otherStrength), .2f, .6f);
+                    ModifyMove(false, directionMod, impedanceFactor, impedanceFactor, .9f);
+                }
+                
+
+                break;
+            default:
+                break;
+        }
+
+        //bust
 
 
     }

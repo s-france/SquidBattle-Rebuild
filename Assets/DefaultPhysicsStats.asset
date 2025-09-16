@@ -201,6 +201,7 @@ MonoBehaviour:
   maxMoveSpeed: 31
   maxMoveTime: 0.28
   maxMovePower: 2
+  knockbackMultiplier: 1.2
   pushOutPower: 0.3
   armorCurve:
     serializedVersion: 2

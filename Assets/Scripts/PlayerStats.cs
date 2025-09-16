@@ -16,7 +16,6 @@ public class PlayerStats : PhysicsStats
     //public float chargeStrength; //not currently in use
 
     //movement
-    public float knockbackMultiplier;
     public float DIStrength;
     public float forwardDIStrength;
     public float lateralDIStrength;
