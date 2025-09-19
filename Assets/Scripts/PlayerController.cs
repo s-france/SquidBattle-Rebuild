@@ -75,13 +75,13 @@ public class PlayerController : MonoBehaviour
         {
             chargePressed = true;
 
-            Debug.Log("Player" + pi.playerIndex + " pressed A");
+            //Debug.Log("Player" + pi.playerIndex + " pressed A");
         }
         else if (ctx.canceled)
         {
             chargePressed = false;
 
-            if (!phys.isKnockback && !phys.isHitstop)
+            if (!phys.isKnockback && !phys.isHitStop)
             {
                 phys.ApplyMove(false, Mathf.Clamp(chargeTime/stats.maxChargeTime, stats.minCharge, 1), aim_move);
             }

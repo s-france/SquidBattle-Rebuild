@@ -280,3 +280,37 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  hitStopCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 8.314355
+      outSlope: 8.314355
+      tangentMode: 0
+      weightedMode: 2
+      inWeight: 0
+      outWeight: 0.028297437
+    - serializedVersion: 3
+      time: 0.5226318
+      value: 0.5003407
+      inSlope: 0.7990774
+      outSlope: 0.7990774
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.18597464
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1.24986
+      outSlope: 1.24986
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.15630892
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  maxHitStop: 0.12

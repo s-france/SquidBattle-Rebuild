@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81a5515d96186414a85f5d6051173a82, type: 3}
+  m_Name: DefaultPhysicsObjSpriteSet
+  m_EditorClassIdentifier: 
+  idleSprite: {fileID: 21300000, guid: 6b95bd3b5b937b6458ea31363b33200e, type: 3}
+  glidingSprite: {fileID: 21300000, guid: 6b95bd3b5b937b6458ea31363b33200e, type: 3}
+  movingSprite: {fileID: 21300000, guid: c6f597db052dded4195e96c23c115491, type: 3}
+  knockbackSprite: {fileID: 21300000, guid: 6b95bd3b5b937b6458ea31363b33200e, type: 3}
+  hitStopSprite: {fileID: 21300000, guid: 377d3995c17cd5f46a773e49291bbaed, type: 3}

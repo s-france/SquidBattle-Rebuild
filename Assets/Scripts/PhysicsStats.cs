@@ -34,6 +34,10 @@ public class PhysicsStats : ScriptableObject
     //knockback
     public AnimationCurve directnessKBCurve;
 
+    //hitstop
+    public AnimationCurve hitStopCurve;
+    public float maxHitStop;
+
 
 
 }

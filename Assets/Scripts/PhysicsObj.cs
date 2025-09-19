@@ -31,7 +31,7 @@ public class PhysicsObj : MonoBehaviour
     [HideInInspector] public bool isMoving;
     [HideInInspector] public bool isKnockback = false;
     [HideInInspector] public bool isGliding;
-    [HideInInspector] public bool isHitstop;
+    [HideInInspector] public bool isHitStop;
     [HideInInspector] public bool isInvincible;
     [HideInInspector] public bool isIntangible;
     [HideInInspector] public List<Vector2> prevPos; //list of previous positions (used in collision pos correction)
@@ -58,6 +58,11 @@ public class PhysicsObj : MonoBehaviour
     float initialMovePower = 0;
     float glideTimer = 0;
     //
+
+    //hitstop
+    [HideInInspector] public float hitStopTime = 0;
+    [HideInInspector] public float hitStopTimer = 0;
+
 
     //armor system
     [HideInInspector] public float passiveArmor = 0; //actual current passive armor used in KB calc
@@ -97,7 +102,7 @@ public class PhysicsObj : MonoBehaviour
         ArmorTick();
 
         MovementTick();
-
+        HitStopTick();
     }
 
 
@@ -105,55 +110,80 @@ public class PhysicsObj : MonoBehaviour
     //processes movement
     void MovementTick()
     {
-        if (moveTimer < moveTime) //moving
+        if (!isHitStop)
         {
-            isMoving = true;
-            isGliding = false;
+            if (moveTimer < moveTime) //moving
+            {
+                isMoving = true;
+                isGliding = false;
 
-            //set priority??? (knockbakc)
+                //set priority??? (knockbakc)
 
-            //move
-            rb.velocity = moveSpeed * stats.MoveCurve.Evaluate(moveTimer / moveTime) * rb.velocity.normalized;
-            //increment timer
-            moveTimer += Time.deltaTime;
+                //move
+                rb.velocity = moveSpeed * stats.MoveCurve.Evaluate(moveTimer / moveTime) * rb.velocity.normalized;
+                //increment timer
+                moveTimer += Time.deltaTime;
+
+            }
+            else if (glideTimer < glideTime) //Gliding
+            {
+                isMoving = false;
+                isKnockback = false;
+                isGliding = true;
+
+                moveArmor = 0;
+
+                //scale power down based on movecurve progress
+                movePower = stats.MoveCurve.Evaluate(1 + (glideTimer / glideTime)) * initialMovePower;
+
+                rb.velocity = stats.MoveCurve.Evaluate(1 + (glideTimer / glideTime)) * glideSpeed * rb.velocity.normalized;
+
+                glideTimer += (Time.fixedDeltaTime * glideRate);
+
+
+            }
+            else //done no movement
+            {
+                isMoving = false;
+                isKnockback = false;
+                isGliding = false;
+
+                moveArmor = 0;
+
+                glideTime = moveTime = moveSpeed = 0;
+
+                movePower = 0;
+                initialMovePower = 0;
+                rb.velocity = Vector2.zero;
+
+            }
 
         }
-        else if (glideTimer < glideTime) //Gliding
+        
+
+
+
+    }
+
+    //hitstop tracked in FixedUpdate()
+    void HitStopTick()
+    {
+        //in hitstop
+        if(hitStopTimer < hitStopTime)
         {
-            isMoving = false;
-            isKnockback = false;
-            isGliding = true;
-
-            moveArmor = 0;
-
-            //scale power down based on movecurve progress
-            movePower = stats.MoveCurve.Evaluate(1 + (glideTimer / glideTime)) * initialMovePower;
-
-            rb.velocity = stats.MoveCurve.Evaluate(1 + (glideTimer / glideTime)) * glideSpeed * rb.velocity.normalized;
-
-            glideTimer += (Time.fixedDeltaTime * glideRate);
-
-
-        }
-        else //done no movement
-        {
-            isMoving = false;
-            isKnockback = false;
-            isGliding = false;
-
-            moveArmor = 0;
-
-            glideTime = moveTime = moveSpeed = 0;
-
-            movePower = 0;
-            initialMovePower = 0;
+            isHitStop = true;            
             rb.velocity = Vector2.zero;
+            hitStopTimer += Time.fixedDeltaTime;
+        } else //not in hitstop
+        {
+            if(isHitStop) //first frame out of hitstop
+            {
+                //continue whatever movement is stored
+                rb.velocity = storedVelocity;
+            }
 
-
-
+            isHitStop = false;
         }
-
-
 
     }
 
@@ -168,6 +198,7 @@ public class PhysicsObj : MonoBehaviour
         }
         //save previous position
         prevPos.Add(transform.position);
+
 
 
     }
@@ -189,6 +220,11 @@ public class PhysicsObj : MonoBehaviour
     //applys new move - sets movement variables
     public void ApplyMove(bool isKB, float moveForce, Vector2 direction) //player-inputted moveForce is always between 0-1  //KB force can exceed 1
     {
+        Debug.Log("ApplyMove!");
+        Debug.Log("isKB: " + isKB);
+        Debug.Log("moveForce: " + moveForce);
+        Debug.Log("direction: " + direction);
+
         isKnockback = isKB;
 
         moveTime = stats.maxMoveTime * stats.moveTimeCurve.Evaluate(moveForce);
@@ -209,8 +245,13 @@ public class PhysicsObj : MonoBehaviour
             //apply armor if not KB
             moveArmor = stats.maxMoveArmor * stats.armorCurve.Evaluate(moveForce);
         }
-        
+
         rb.velocity = direction.normalized;
+        if (isHitStop) //use storedvelocity if in hitstop
+        {
+            storedVelocity = direction.normalized;
+        }
+        
     }
 
 
@@ -221,12 +262,14 @@ public class PhysicsObj : MonoBehaviour
     //powerMod => modifier applied to current movePower
     void ModifyMove(bool isKB, Vector2 directionMod, float durationMod, float speedMod, float powerMod)
     {
+        Debug.Log("ModifyMove!");
+
         isKnockback = isKB;
 
         //mod direction
         Vector2 direction; 
         
-        if(isHitstop)
+        if(isHitStop)
         {
             direction = (directionMod + storedVelocity.normalized).normalized;
             storedVelocity = storedVelocity.magnitude * direction;
@@ -253,6 +296,58 @@ public class PhysicsObj : MonoBehaviour
     }
 
 
+    //type 0: additive
+    //type 1: overwrite
+    void ApplyHitStop(int type, float time)
+    {
+        Debug.Log("applyhitstop time: " + time);
+        
+        if (type == 0)
+        {
+            AddHitStop(time);
+        }
+        else if (type == 1)
+        {
+            SetHitStop(time);
+        }
+    }
+
+    //sets hitstop to time value
+    void SetHitStop(float time)
+    {
+        //init hitstop if not already in hitstop
+        if(!isHitStop)
+        {
+            isHitStop = true;
+            storedVelocity = rb.velocity;
+            rb.velocity = Vector2.zero;
+        }
+        
+
+        //overwrite current hitstop to this
+        hitStopTime = time;
+        hitStopTimer = 0;
+    }
+
+    //adds hitstop time on top of current hitstop
+    void AddHitStop(float time)
+    {
+        //init hitstop if not already in hitstop
+        if(!isHitStop)
+        {
+            //use SetHitstop if nothing to add to
+            SetHitStop(time);
+        } else
+        {
+            //prevent overstacking
+            //Mathf.Clamp(hitStopTime, 0, maxHitstop);
+            //add extra time to current hitstoptime
+            hitStopTime += time;
+        }
+
+    }
+
+
     public void OnTriggerEnter2D(Collider2D col)
     {
 
@@ -267,6 +362,7 @@ public class PhysicsObj : MonoBehaviour
                 //exit if peer intangible
                 if (IntangiblePeerPrioTable.ContainsKey(otherObj) && IntangiblePeerPrioTable[otherObj] > 0)
                 {
+                    Debug.Log("peer intangible, exiting");
                     return;
                 }
 
@@ -286,8 +382,8 @@ public class PhysicsObj : MonoBehaviour
                     //correct collision position
                     var (pos, otherPos) = EstimateCircleTriggerCollision(triggerCol.radius * transform.localScale.x, otherObj.triggerCol.radius * otherObj.transform.localScale.x, transform.position, prev, otherObj.transform.position, otherPrev);
 
-                    Debug.Log("newPos: " + pos);
-                    Debug.Log("otherNewPos: " + otherPos);
+                    //Debug.Log("newPos: " + pos);
+                    //Debug.Log("otherNewPos: " + otherPos);
 
                     transform.position = pos;
                     otherObj.transform.position = otherPos; //is this needed?
@@ -349,7 +445,7 @@ public class PhysicsObj : MonoBehaviour
         //if other physics obj
         if (col.isTrigger && col.TryGetComponent<PhysicsObj>(out PhysicsObj otherObj))
         {
-            if (!isMoving && !isHitstop)
+            if (!isMoving && !isHitStop)
             {
                 //push out overlapping triggerHBs
                 Vector2 away = (col.transform.position - transform.position).normalized;
@@ -377,12 +473,13 @@ public class PhysicsObj : MonoBehaviour
 
     public IEnumerator Knockback(PhysicsObj otherObj)
     {
-        //make peer intangible
-        //SetPeerPriority(IntangiblePeerPrioTable, otherObj, 1);
+        //THIS IS SUS:
+        //baseline peer intangibility to prevent double collisions
+        SetPeerPriority(IntangiblePeerPrioTable, otherObj, .1f);
 
         //true velocity at impact
-        Vector2 velocity = isHitstop ? storedVelocity : rb.velocity;
-        Vector2 otherVelocity = otherObj.isHitstop ? otherObj.storedVelocity : otherObj.rb.velocity;
+        Vector2 velocity = isHitStop ? storedVelocity : rb.velocity;
+        Vector2 otherVelocity = otherObj.isHitStop ? otherObj.storedVelocity : otherObj.rb.velocity;
 
         //move priorities
         int mPrio = CalcMovePrio(this);
@@ -467,10 +564,10 @@ public class PhysicsObj : MonoBehaviour
                 //deflected
                 mPrio = -1;
             }
-            else
+            else if (mPrio > 0)
             {
                 //overpowered
-                mPrio = 1;
+                mPrio = 1; 
             }
 
             //armor overpower
@@ -491,12 +588,13 @@ public class PhysicsObj : MonoBehaviour
 
 
         //apply impact hitstop
-        //ApplyHitStop(maxHitstop * hitstopCurve.Evaluate(hitstop), 1);
+        ApplyHitStop(1, stats.maxHitStop * stats.hitStopCurve.Evaluate(hitstop));
 
         /////
         //wait one tick so both sides' KB calcs can finish
         yield return new WaitForFixedUpdate();
         /////
+        
 
         //movearmor gets decreased permanently
         float remainingAttack = moveArmor - otherStrength;
@@ -520,6 +618,7 @@ public class PhysicsObj : MonoBehaviour
         {
             //overpower "barrel through"
             //impedance based on otherStrength
+            Debug.Log("overpowering");
 
             //give this player intangible priority from otherPlayer
             //8 ticks of intangibility
@@ -546,11 +645,12 @@ public class PhysicsObj : MonoBehaviour
         //sort of works, needs tuning (too much KB mitigation)
         otherStrength = .5f * (otherStrength + armoredOtherStrength);
         strength = .5f * (strength + armoredStrength);
+
         
         switch (mPrio)
         {
             case -1: //armor deflect
-                
+
                 //give this player intangible priority from otherPlayer
                 //EDIT THIS: int constant = invol frame data
                 //IntangiblePeerPrioTable[otherPC] = 8 * Time.fixedDeltaTime;
@@ -563,7 +663,7 @@ public class PhysicsObj : MonoBehaviour
 
                 break;
             case 0: //standing still
-                if(otherMPrio <= 1) //other standing still / gliding
+                if (otherMPrio <= 1) //other standing still / gliding
                 {
                     //ADD THIS:
                     //weak gliding KB nudge
@@ -571,15 +671,17 @@ public class PhysicsObj : MonoBehaviour
 
                     ApplyMove(true, stats.knockbackMultiplier * otherStrength, direction);
 
-                } else if(otherMPrio == 2) //other being KB launched
+                }
+                else if (otherMPrio == 2) //other being KB launched
                 {
                     //use other player's stats for KB
-                    direction = ((otherDirectness * otherImpactDirection) + (otherPosDiff * (1/otherDirectness))).normalized;
+                    direction = ((otherDirectness * otherImpactDirection) + (otherPosDiff * (1 / otherDirectness))).normalized;
 
 
                     //powerful attack KB
                     ApplyMove(true, stats.knockbackMultiplier * otherStrength, direction);
-                } else if(otherMPrio >= 3) //other moving attacking
+                }
+                else if (otherMPrio >= 3) //other moving attacking
                 {
                     //give this player intangible priority from otherPlayer
                     //EDIT THIS: int constant = invol frame data
@@ -588,7 +690,7 @@ public class PhysicsObj : MonoBehaviour
 
 
                     //use other player's stats for KB
-                    direction = ((otherDirectness * otherImpactDirection) + (otherPosDiff * (1/otherDirectness))).normalized;
+                    direction = ((otherDirectness * otherImpactDirection) + (otherPosDiff * (1 / otherDirectness))).normalized;
 
                     //TWEAK THIS - calc should be more biased to otherPlayer
                     //powerful attack KB
@@ -631,7 +733,7 @@ public class PhysicsObj : MonoBehaviour
 
                 break;
             case 2: //knockback launch
-                if(otherMPrio <= 1)
+                if (otherMPrio <= 1)
                 {
                     //give this player intangible priority from otherPlayer
                     //EDIT THIS: int constant = invol frame data
@@ -648,7 +750,7 @@ public class PhysicsObj : MonoBehaviour
                     //factors: otherPosDiff, otherRB direction, 
                     directionMod = ((2 * otherPosDiff.normalized) + (5 * otherVelocity.normalized)).normalized * Mathf.Clamp((3 * otherStrength), .4f, 1);
 
-                    ModifyMove(false, directionMod, 1.1f, .95f, 1);      
+                    ModifyMove(false, directionMod, 1.1f, .95f, 1);
 
 
                     //old "8ball" behaviour works for now
@@ -665,10 +767,11 @@ public class PhysicsObj : MonoBehaviour
                     //idk
 
 
-                } else if(otherMPrio == 2)
+                }
+                else if (otherMPrio == 2)
                 {
                     //this should be good (same as 3,3 impact)
-                    direction = (((3 * Mathf.Clamp(otherDirectness, (otherObj.movePower/otherObj.stats.maxMovePower), 2)) * otherImpactDirection) + (otherPosDiff * (1/Mathf.Clamp(otherDirectness, (otherObj.movePower/otherObj.stats.maxMovePower), 2))) + (.7f * (1 - (Vector2.Angle(impactDirection, otherImpactDirection)/180)) * powerRatio * impactDirection)).normalized;
+                    direction = (((3 * Mathf.Clamp(otherDirectness, (otherObj.movePower / otherObj.stats.maxMovePower), 2)) * otherImpactDirection) + (otherPosDiff * (1 / Mathf.Clamp(otherDirectness, (otherObj.movePower / otherObj.stats.maxMovePower), 2))) + (.7f * (1 - (Vector2.Angle(impactDirection, otherImpactDirection) / 180)) * powerRatio * impactDirection)).normalized;
 
                     //Equal KB exchange
                     ApplyMove(true, stats.knockbackMultiplier * otherStrength, direction);
@@ -676,12 +779,13 @@ public class PhysicsObj : MonoBehaviour
                     //TRY THIS:
                     //impede stronger player's KB more
 
-                } else if(otherMPrio >= 3)
+                }
+                else if (otherMPrio >= 3)
                 {
                     //TUNE THIS
                     //use other player's direction in calc
 
-                    direction = (((3 * Mathf.Clamp(otherDirectness, (otherObj.movePower/otherObj.stats.maxMovePower), 2)) * otherImpactDirection) + (otherPosDiff * (1/Mathf.Clamp(otherDirectness, (otherObj.movePower/otherObj.stats.maxMovePower), 2))) + (.7f * (1 - (Vector2.Angle(impactDirection, otherImpactDirection)/180)) * powerRatio * impactDirection)).normalized;
+                    direction = (((3 * Mathf.Clamp(otherDirectness, (otherObj.movePower / otherObj.stats.maxMovePower), 2)) * otherImpactDirection) + (otherPosDiff * (1 / Mathf.Clamp(otherDirectness, (otherObj.movePower / otherObj.stats.maxMovePower), 2))) + (.7f * (1 - (Vector2.Angle(impactDirection, otherImpactDirection) / 180)) * powerRatio * impactDirection)).normalized;
 
                     //receive full KB
                     ApplyMove(true, stats.knockbackMultiplier * otherStrength, direction);
@@ -689,7 +793,7 @@ public class PhysicsObj : MonoBehaviour
 
                 break;
             case 3: //moving launch
-                if(otherMPrio <= 1)
+                if (otherMPrio <= 1)
                 {
                     //"barrel through"
                     //impedance based on otherStrength
@@ -704,7 +808,7 @@ public class PhysicsObj : MonoBehaviour
                     //EDIT THIS: int constant = overPower frame data
                     //OverpowerPeerPrioTable[otherPC] = 6 * Time.fixedDeltaTime;
                     SetPeerPriority(OverpowerPeerPrioTable, otherObj, 6 * Time.fixedDeltaTime);
-                  
+
                     //alter travel distance
                     impedanceFactor = 1 - Mathf.Clamp(1 * otherStrength, .1f, 1);
 
@@ -712,10 +816,11 @@ public class PhysicsObj : MonoBehaviour
                     //factors: otherPosDiff, otherRB direction, 
                     directionMod = ((2 * otherPosDiff.normalized) + (5 * otherVelocity.normalized)).normalized * Mathf.Clamp((3 * otherStrength), .4f, 1);
 
-                    ModifyMove(false, directionMod, impedanceFactor, impedanceFactor, .9f);                        
+                    ModifyMove(false, directionMod, impedanceFactor, impedanceFactor, .9f);
 
-                } else if(otherMPrio == 2)
-                {                    
+                }
+                else if (otherMPrio == 2)
+                {
                     //ADD THIS
                     //apply reduced knockback based on powerDiff
 
@@ -725,21 +830,22 @@ public class PhysicsObj : MonoBehaviour
                     //ADD THIS:
                     //tweak (powerRatio * impactDirection vals)
                     //to allow overpowering players in weak KB launch
-                    direction = (((3 * Mathf.Clamp(otherDirectness, (otherObj.movePower/otherObj.stats.maxMovePower), 2)) * otherImpactDirection) + (otherPosDiff * (1/Mathf.Clamp(otherDirectness, (otherObj.movePower/otherObj.stats.maxMovePower), 2))) + (.7f * (1 - (Vector2.Angle(impactDirection, otherImpactDirection)/180)) * powerRatio * impactDirection)).normalized;
+                    direction = (((3 * Mathf.Clamp(otherDirectness, (otherObj.movePower / otherObj.stats.maxMovePower), 2)) * otherImpactDirection) + (otherPosDiff * (1 / Mathf.Clamp(otherDirectness, (otherObj.movePower / otherObj.stats.maxMovePower), 2))) + (.7f * (1 - (Vector2.Angle(impactDirection, otherImpactDirection) / 180)) * powerRatio * impactDirection)).normalized;
 
 
                     ApplyMove(true, stats.knockbackMultiplier * otherStrength, direction);
 
-                } else if(otherMPrio >= 3)
+                }
+                else if (otherMPrio >= 3)
                 {
                     //ADD THIS: update strength calc
                     //less weight on otherdirectness
                     //add weight from (1/otherDirectness) * this player's moveTimer/moveTime
-                    
-                    
+
+
                     //new direction calc
                     //GOOD:
-                    direction = (((3 * Mathf.Clamp(otherDirectness, (otherObj.movePower/otherObj.stats.maxMovePower), 2)) * otherImpactDirection) + (otherPosDiff * (1/Mathf.Clamp(otherDirectness, (otherObj.movePower/otherObj.stats.maxMovePower), 2))) + (.7f * (1 - (Vector2.Angle(impactDirection, otherImpactDirection)/180)) * powerRatio * impactDirection)).normalized;
+                    direction = (((3 * Mathf.Clamp(otherDirectness, (otherObj.movePower / otherObj.stats.maxMovePower), 2)) * otherImpactDirection) + (otherPosDiff * (1 / Mathf.Clamp(otherDirectness, (otherObj.movePower / otherObj.stats.maxMovePower), 2))) + (.7f * (1 - (Vector2.Angle(impactDirection, otherImpactDirection) / 180)) * powerRatio * impactDirection)).normalized;
                     //DONE LFG
 
                     //Equal KB exchange
@@ -750,10 +856,11 @@ public class PhysicsObj : MonoBehaviour
 
             case 4: //armored
 
-                if(otherMPrio == -1)
+                if (otherMPrio == -1)
                 {
 
-                } else
+                }
+                else
                 {
                     //barrel through
                     //"barrel through"
@@ -768,7 +875,7 @@ public class PhysicsObj : MonoBehaviour
                     //EDIT THIS: int constant = overPower frame data
                     //OverpowerPeerPrioTable[otherPC] = 6 * Time.fixedDeltaTime;
                     SetPeerPriority(OverpowerPeerPrioTable, otherObj, 6 * Time.fixedDeltaTime);
-                   
+
                     //max possible glidestrength = maxMovePower * .1
                     Debug.Log("otherStrength = " + otherStrength);
                     //alter travel distance
@@ -779,7 +886,7 @@ public class PhysicsObj : MonoBehaviour
                     directionMod = ((2 * otherPosDiff.normalized) + (4 * otherVelocity.normalized)).normalized * Mathf.Clamp((.5f * otherStrength), .2f, .6f);
                     ModifyMove(false, directionMod, impedanceFactor, impedanceFactor, .9f);
                 }
-                
+
 
                 break;
             default:
@@ -792,12 +899,13 @@ public class PhysicsObj : MonoBehaviour
     }
 
 
-    //calculcates movepriotiy
+    //calculcates movepriority
+    //also useful to get state
     //0 = standing still
     //1 = gliding
     //2 = knockback
     //3 = launch movement
-    int CalcMovePrio(PhysicsObj obj)
+    public int CalcMovePrio(PhysicsObj obj)
     {
         int mPrio = 0;
 
@@ -835,10 +943,10 @@ public class PhysicsObj : MonoBehaviour
     //process Peer Priority updates (FixedUpdate)
     void PeerPriorityTick()
     {
-        if (!isHitstop)
+        if (!isHitStop)
         {
             //if done attacking reset overpower priority
-            if ((!isMoving || isKnockback) && !isHitstop)
+            if ((!isMoving || isKnockback) && !isHitStop)
             {
                 //clear overpower prio table
                 for (int i = 0; i < OverpowerPeerPrioTable.Count; i++)
