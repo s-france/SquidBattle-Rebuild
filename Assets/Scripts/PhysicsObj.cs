@@ -44,7 +44,7 @@ public class PhysicsObj : MonoBehaviour
 
     float moveTime = 0;
 
-    float movePower = 0;
+    [HideInInspector] public float movePower = 0;
 
     float moveTimer = 0;
 
@@ -220,11 +220,6 @@ public class PhysicsObj : MonoBehaviour
     //applys new move - sets movement variables
     public void ApplyMove(bool isKB, float moveForce, Vector2 direction) //player-inputted moveForce is always between 0-1  //KB force can exceed 1
     {
-        Debug.Log("ApplyMove!");
-        Debug.Log("isKB: " + isKB);
-        Debug.Log("moveForce: " + moveForce);
-        Debug.Log("direction: " + direction);
-
         isKnockback = isKB;
 
         moveTime = stats.maxMoveTime * stats.moveTimeCurve.Evaluate(moveForce);
@@ -260,9 +255,8 @@ public class PhysicsObj : MonoBehaviour
     //directionMod => modifier applied to current rb direction
     //durationMod => modifier applied to current moveTime + moveTimer vars
     //powerMod => modifier applied to current movePower
-    void ModifyMove(bool isKB, Vector2 directionMod, float durationMod, float speedMod, float powerMod)
+    public void ModifyMove(bool isKB, Vector2 directionMod, float durationMod, float speedMod, float powerMod)
     {
-        Debug.Log("ModifyMove!");
 
         isKnockback = isKB;
 
@@ -300,7 +294,6 @@ public class PhysicsObj : MonoBehaviour
     //type 1: overwrite
     void ApplyHitStop(int type, float time)
     {
-        Debug.Log("applyhitstop time: " + time);
         
         if (type == 0)
         {
@@ -362,7 +355,6 @@ public class PhysicsObj : MonoBehaviour
                 //exit if peer intangible
                 if (IntangiblePeerPrioTable.ContainsKey(otherObj) && IntangiblePeerPrioTable[otherObj] > 0)
                 {
-                    Debug.Log("peer intangible, exiting");
                     return;
                 }
 
@@ -618,7 +610,6 @@ public class PhysicsObj : MonoBehaviour
         {
             //overpower "barrel through"
             //impedance based on otherStrength
-            Debug.Log("overpowering");
 
             //give this player intangible priority from otherPlayer
             //8 ticks of intangibility
@@ -742,7 +733,6 @@ public class PhysicsObj : MonoBehaviour
 
 
                     //max possible glidestrength = maxMovePower * .1
-                    Debug.Log("otherStrength = " + otherStrength);
                     //alter travel distance
                     impedanceFactor = 1 - Mathf.Clamp(1 * otherStrength, .1f, 1);
 
@@ -877,7 +867,6 @@ public class PhysicsObj : MonoBehaviour
                     SetPeerPriority(OverpowerPeerPrioTable, otherObj, 6 * Time.fixedDeltaTime);
 
                     //max possible glidestrength = maxMovePower * .1
-                    Debug.Log("otherStrength = " + otherStrength);
                     //alter travel distance
                     impedanceFactor = 1 - Mathf.Clamp(.3f * otherStrength, .2f, 1);
 

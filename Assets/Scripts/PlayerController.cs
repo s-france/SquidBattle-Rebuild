@@ -31,7 +31,6 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public bool specialCharging = false;
     [HideInInspector] public float specialChargeTime = 0;
 
-
     //
 
 
