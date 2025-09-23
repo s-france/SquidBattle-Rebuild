@@ -11,7 +11,7 @@ using UnityEngine.UIElements;
 public class PhysicsObj : MonoBehaviour
 {
     [HideInInspector] public Rigidbody2D rb;
-    Collider2D solidCol;
+    [HideInInspector] public Collider2D solidCol;
     [HideInInspector] public CircleCollider2D triggerCol;
 
     public PhysicsStats stats; //base stats reference for this physics obj

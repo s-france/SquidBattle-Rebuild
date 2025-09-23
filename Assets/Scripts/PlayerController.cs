@@ -11,6 +11,7 @@ using UnityEngine.InputSystem;
 //🐙
 public class PlayerController : MonoBehaviour
 {
+    WaitForFixedUpdate fuWait; //used in FixedUpdate coroutines
     PlayerManager pm;
 
     public PhysicsObj phys;
@@ -37,6 +38,8 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        fuWait = new WaitForFixedUpdate();
+
         pm = FindFirstObjectByType<PlayerManager>();
 
         phys = GetComponent<PhysicsObj>();
@@ -82,7 +85,7 @@ public class PlayerController : MonoBehaviour
 
             if (!phys.isKnockback && !phys.isHitStop)
             {
-                phys.ApplyMove(false, Mathf.Clamp(chargeTime/stats.maxChargeTime, stats.minCharge, 1), aim_move);
+                phys.ApplyMove(false, Mathf.Clamp(chargeTime / stats.maxChargeTime, stats.minCharge, 1), aim_move);
             }
 
         }
@@ -91,6 +94,11 @@ public class PlayerController : MonoBehaviour
 
     public void OnBBack(InputAction.CallbackContext ctx)
     {
+        if (ctx.performed)
+        {
+            pm.SummonPlayers(transform);
+        }
+        
 
     }
 
@@ -267,6 +275,39 @@ public class PlayerController : MonoBehaviour
 
         //assign killcredit
 
+
+    }
+
+    //coroutine to summon/warp player to a position (used in hub world transitions)
+    public IEnumerator SummonPlayer(Transform summonPoint)
+    {
+        //disable collision while summoning
+        phys.solidCol.enabled = false;
+        //phys.triggerCol.enabled = false;
+
+        float accelRate;
+
+
+        float timer = 0; //summon timeout timer
+
+        //try to get to position / timeout after 2 sec
+        while (transform.position != summonPoint.position && timer < 2f)
+        {
+            //acceleration based on distance
+            accelRate = stats.summonAccel * (transform.position - summonPoint.position).magnitude;
+
+            //move toward summon point
+            phys.rb.MovePosition(Vector2.MoveTowards(transform.position, summonPoint.position, stats.summonSpeed * accelRate * Time.fixedDeltaTime));
+
+            timer += Time.fixedDeltaTime;
+
+
+            yield return fuWait;
+        }
+
+        //reenable collision
+        phys.solidCol.enabled = true;
+        //phys.triggerCol.enabled = true;
 
     }
 

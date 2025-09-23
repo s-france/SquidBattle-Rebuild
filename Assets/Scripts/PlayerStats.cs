@@ -25,7 +25,13 @@ public class PlayerStats : PhysicsStats
     //items    
     public int inventorySize;
     public int rewindSize;
-    
+
+    //summoning stats
+    //public float summonTime;
+
+    public float summonAccel;
+    public float summonSpeed;
+
 
 
 }

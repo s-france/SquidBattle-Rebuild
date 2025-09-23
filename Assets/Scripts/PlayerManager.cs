@@ -8,6 +8,7 @@ using UnityEngine.InputSystem;
 using System.Linq;
 //using UnityEngine.iOS;
 using UnityEngine.InputSystem.Users;
+using Cinemachine;
 
 
 public class PlayerManager : MonoBehaviour
@@ -18,7 +19,7 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] GameObject PlayerPrefab; //player obj prefab
 
     public ColorSet PlayerColors;
-    
+
     [HideInInspector] public List<int> TakenColors; //list of taken colors
 
     [HideInInspector] public LevelController lc; //current scene's LevelController (updated by LC)
@@ -26,13 +27,13 @@ public class PlayerManager : MonoBehaviour
     [HideInInspector] public List<PlayerInput> PlayerList;
     [HideInInspector] public List<Team> Teams;
 
+    CinemachineTargetGroup CameraTG;
+
 
 
     // Start is called before the first frame update
     void Start()
     {
-        TakenColors = new List<int>();
-
 
 
 
@@ -53,6 +54,8 @@ public class PlayerManager : MonoBehaviour
             //set levelcontroller (future lc's set by lc in scene)
             lc = FindFirstObjectByType<LevelController>();
 
+            CameraTG = FindFirstObjectByType<CinemachineTargetGroup>();
+
             //instantiate pim + PLayerPrefab
             pim = GetComponent<PlayerInputManager>();
             pim.playerPrefab = PlayerPrefab;
@@ -70,6 +73,9 @@ public class PlayerManager : MonoBehaviour
             Teams.Add(new Team(3));
             Teams.Add(new Team(4));
             Teams.Add(new Team(5));
+
+
+            TakenColors = new List<int>();
 
 
             //device-change tracking event
@@ -250,8 +256,10 @@ public class PlayerManager : MonoBehaviour
         //add new player to PlayerList
         PlayerList.Add(pi);
 
+        //join camera target group
+        CameraTG.AddMember(pi.transform, 1, 1);
 
-        
+
 
         //assign to first empty team
         SetTeam(player, Teams.Find(t => t.Players.Count == 0));
@@ -267,6 +275,9 @@ public class PlayerManager : MonoBehaviour
     public void OnPlayerLeave(PlayerInput pi)
     {
         Debug.Log("Player " + pi.playerIndex + " Left!");
+
+        //remove from camera target group
+        CameraTG.RemoveMember(pi.transform);
 
         //remove from PlayerList
         PlayerList.Remove(pi);
@@ -352,6 +363,20 @@ public class PlayerManager : MonoBehaviour
         player.Team?.Players.Remove(player);
         player.teamIdx = -1;
         player.Team = null;
+    }
+
+
+
+
+    
+    public void SummonPlayers(Transform summonPoint)
+    {
+        foreach (PlayerInput p in PlayerList)
+        {
+            StartCoroutine(p.GetComponent<PlayerController>().SummonPlayer(summonPoint));
+
+        }
+
     }
 
 
