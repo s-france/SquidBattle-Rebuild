@@ -38,8 +38,16 @@ public class GroundTerrain : MonoBehaviour
         col.SendMessage("ExitTerrain", this);
 
     }
+
+
+
+    public void TerrainEffect(PhysicsObj obj)
+    {
+        
+
+    }
     
-    
+
 
 
 }

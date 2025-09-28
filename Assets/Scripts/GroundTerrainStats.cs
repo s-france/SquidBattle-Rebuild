@@ -10,5 +10,9 @@ public class GroundTerrainStats : ScriptableObject
     public float damage; //damage over time dealt to other Objs 
     public float traction; //"slipperiness" of surface -increases moveTime/glideTime -decreases DI influence
 
+    public float timeMod;
+    public float speedMod;
+    public float powerMod;
+
     
 }

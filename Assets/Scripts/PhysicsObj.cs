@@ -62,6 +62,7 @@ public class PhysicsObj : MonoBehaviour
     float glideTimer = 0;
     //
 
+
     //hitstop
     [HideInInspector] public float hitStopTime = 0;
     [HideInInspector] public float hitStopTimer = 0;
@@ -123,6 +124,7 @@ public class PhysicsObj : MonoBehaviour
 
                 //move
                 rb.velocity = moveSpeed * stats.MoveCurve.Evaluate(moveTimer / moveTime) * rb.velocity.normalized;
+                
                 //increment timer
                 moveTimer += Time.deltaTime;
 
@@ -227,9 +229,16 @@ public class PhysicsObj : MonoBehaviour
     {
         isKnockback = isKB;
 
+        //use curves to calc move stats
         moveTime = stats.maxMoveTime * stats.moveTimeCurve.Evaluate(moveForce);
         movePower = initialMovePower = stats.maxMovePower * stats.movePowerCurve.Evaluate(moveForce);
         moveSpeed = glideSpeed = stats.maxMoveSpeed * stats.moveSpeedCurve.Evaluate(moveForce);
+
+        //TRY THIS: only apply mods if !isKB
+        //apply terrain mods
+        moveTime *= currentTerrain.stats.timeMod;
+        movePower *= currentTerrain.stats.powerMod;
+        moveSpeed *= currentTerrain.stats.speedMod;
 
         glideRate = 1;
 
@@ -982,6 +991,9 @@ public class PhysicsObj : MonoBehaviour
         {
             //set new terrain as current
             currentTerrain = terrain;
+
+            //affect current movement //TEST: maaybe not necessary
+            ModifyMove(isKnockback, Vector2.zero, terrain.stats.timeMod, terrain.stats.speedMod, terrain.stats.powerMod);
         }
     }
 
@@ -1010,7 +1022,7 @@ public class PhysicsObj : MonoBehaviour
 
     void TerrainTick()
     {
-        
+
     }
 
     
