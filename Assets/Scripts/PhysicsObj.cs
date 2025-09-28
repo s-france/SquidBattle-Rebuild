@@ -36,6 +36,9 @@ public class PhysicsObj : MonoBehaviour
     [HideInInspector] public bool isIntangible;
     [HideInInspector] public List<Vector2> prevPos; //list of previous positions (used in collision pos correction)
     [HideInInspector] public Vector2 storedVelocity; //stored true velocity carried through hitstop
+    [HideInInspector] public List<GroundTerrain> TerrainContacts;
+    [HideInInspector] public GroundTerrain currentTerrain;
+
 
     //
 
@@ -62,7 +65,6 @@ public class PhysicsObj : MonoBehaviour
     //hitstop
     [HideInInspector] public float hitStopTime = 0;
     [HideInInspector] public float hitStopTimer = 0;
-
 
     //armor system
     [HideInInspector] public float passiveArmor = 0; //actual current passive armor used in KB calc
@@ -159,7 +161,7 @@ public class PhysicsObj : MonoBehaviour
             }
 
         }
-        
+
 
 
 
@@ -169,14 +171,15 @@ public class PhysicsObj : MonoBehaviour
     void HitStopTick()
     {
         //in hitstop
-        if(hitStopTimer < hitStopTime)
+        if (hitStopTimer < hitStopTime)
         {
-            isHitStop = true;            
+            isHitStop = true;
             rb.velocity = Vector2.zero;
             hitStopTimer += Time.fixedDeltaTime;
-        } else //not in hitstop
+        }
+        else //not in hitstop
         {
-            if(isHitStop) //first frame out of hitstop
+            if (isHitStop) //first frame out of hitstop
             {
                 //continue whatever movement is stored
                 rb.velocity = storedVelocity;
@@ -187,7 +190,7 @@ public class PhysicsObj : MonoBehaviour
 
     }
 
-    //updates/tracks physics state
+    //updates/tracks state of physicsObj
     void TrackStateTick()
     {
         //storing previous position for use in trigger collision corrections
@@ -201,16 +204,18 @@ public class PhysicsObj : MonoBehaviour
 
 
 
+
     }
 
     //tick armor stats
     //runs in FixedUpdate()
     void ArmorTick()
     {
-        if(passiveArmor < stats.maxPassiveArmor)
+        if (passiveArmor < stats.maxPassiveArmor)
         {
             passiveArmor = Mathf.Clamp(passiveArmor + Time.fixedDeltaTime, 0, stats.maxPassiveArmor);
-        } else
+        }
+        else
         {
             passiveArmor = stats.maxPassiveArmor;
         }
@@ -246,7 +251,7 @@ public class PhysicsObj : MonoBehaviour
         {
             storedVelocity = direction.normalized;
         }
-        
+
     }
 
 
@@ -261,13 +266,14 @@ public class PhysicsObj : MonoBehaviour
         isKnockback = isKB;
 
         //mod direction
-        Vector2 direction; 
-        
-        if(isHitStop)
+        Vector2 direction;
+
+        if (isHitStop)
         {
             direction = (directionMod + storedVelocity.normalized).normalized;
             storedVelocity = storedVelocity.magnitude * direction;
-        } else
+        }
+        else
         {
             direction = (directionMod + rb.velocity.normalized).normalized;
             rb.velocity = rb.velocity.magnitude * direction;
@@ -294,7 +300,7 @@ public class PhysicsObj : MonoBehaviour
     //type 1: overwrite
     void ApplyHitStop(int type, float time)
     {
-        
+
         if (type == 0)
         {
             AddHitStop(time);
@@ -309,13 +315,13 @@ public class PhysicsObj : MonoBehaviour
     void SetHitStop(float time)
     {
         //init hitstop if not already in hitstop
-        if(!isHitStop)
+        if (!isHitStop)
         {
             isHitStop = true;
             storedVelocity = rb.velocity;
             rb.velocity = Vector2.zero;
         }
-        
+
 
         //overwrite current hitstop to this
         hitStopTime = time;
@@ -326,11 +332,12 @@ public class PhysicsObj : MonoBehaviour
     void AddHitStop(float time)
     {
         //init hitstop if not already in hitstop
-        if(!isHitStop)
+        if (!isHitStop)
         {
             //use SetHitstop if nothing to add to
             SetHitStop(time);
-        } else
+        }
+        else
         {
             //prevent overstacking
             //Mathf.Clamp(hitStopTime, 0, maxHitstop);
@@ -543,7 +550,7 @@ public class PhysicsObj : MonoBehaviour
         //calculate knockback direction
         Vector2 direction;
         //direction when one player overpowers other               
-        direction = ((otherDirectness * otherImpactDirection) + (otherPosDiff * (1/otherDirectness))).normalized;
+        direction = ((otherDirectness * otherImpactDirection) + (otherPosDiff * (1 / otherDirectness))).normalized;
 
 
 
@@ -559,7 +566,7 @@ public class PhysicsObj : MonoBehaviour
             else if (mPrio > 0)
             {
                 //overpowered
-                mPrio = 1; 
+                mPrio = 1;
             }
 
             //armor overpower
@@ -586,7 +593,7 @@ public class PhysicsObj : MonoBehaviour
         //wait one tick so both sides' KB calcs can finish
         yield return new WaitForFixedUpdate();
         /////
-        
+
 
         //movearmor gets decreased permanently
         float remainingAttack = moveArmor - otherStrength;
@@ -637,7 +644,7 @@ public class PhysicsObj : MonoBehaviour
         otherStrength = .5f * (otherStrength + armoredOtherStrength);
         strength = .5f * (strength + armoredStrength);
 
-        
+
         switch (mPrio)
         {
             case -1: //armor deflect
@@ -960,12 +967,52 @@ public class PhysicsObj : MonoBehaviour
 
 
         }
-        
-
-
 
 
     }
+
+    //terrain system Enter/Exit (Unity Messages)
+    public void EnterTerrain(GroundTerrain terrain)
+    {
+        //add terrain to contacts list
+        TerrainContacts.Add(terrain);
+
+        //if new terrain has highest priority
+        if (terrain.stats.priority >= currentTerrain.stats.priority)
+        {
+            //set new terrain as current
+            currentTerrain = terrain;
+        }
+    }
+
+    public void ExitTerrain(GroundTerrain terrain)
+    {
+        //remove terrain from contacts list
+        TerrainContacts.Remove(terrain);
+
+        //if leaving current terrain - find+set new current terrain
+        if (terrain == currentTerrain)
+        {
+            //temp priority tracker
+            int priority = -1;
+            foreach (GroundTerrain t in TerrainContacts)
+            {
+                if (t.stats.priority > priority)
+                {
+                    //set current terrain to that with highest priority
+                    currentTerrain = t;
+                    priority = t.stats.priority;
+                }
+            }
+        }
+
+    }
+
+    void TerrainTick()
+    {
+        
+    }
+
     
 
 }

@@ -17,13 +17,6 @@ public class SolidTerrain : MonoBehaviour
 
     }
 
-    /*
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-    */
 
 
 
@@ -31,8 +24,6 @@ public class SolidTerrain : MonoBehaviour
     {
         if (col.gameObject.TryGetComponent<PhysicsObj>(out PhysicsObj obj))
         {
-            //IF NECESSARY IDK MIGHT ALREADY HAPPEN:
-            //redirect physobj movement direction
 
             //modify obj movement based on terrain stats
             obj.ModifyMove(obj.isKnockback, Vector2.zero, stats.timeMod, stats.speedMod, stats.powerMod);

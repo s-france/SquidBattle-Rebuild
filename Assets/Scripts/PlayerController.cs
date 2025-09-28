@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Mono.Cecil.Cil;
 using UnityEditor.Callbacks;
 
@@ -27,6 +28,9 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public Vector2 aim_move; //last non-zero left stick input
 
     //player state tracking
+    [HideInInspector] public Queue<PlayerState> prevStates; //queue of previous states used in rewind function
+    [HideInInspector] public PlayerState prevState;  //immediate previous state
+    [HideInInspector] public float staticTimer = 0;
     [HideInInspector] public bool charging = false;
     [HideInInspector] public float chargeTime = 0;
     [HideInInspector] public bool specialCharging = false;
@@ -47,6 +51,8 @@ public class PlayerController : MonoBehaviour
         pi = GetComponent<PlayerInput>();
         data = GetComponent<PlayerData>();
 
+        //init prevStates queue to size of max rewind
+        prevStates = new Queue<PlayerState>(stats.rewindSize);
     }
 
     // Update is called once per frame
@@ -59,6 +65,8 @@ public class PlayerController : MonoBehaviour
     {
         ChargeTick();
         DITick();
+
+        TrackStateTick();
     }
 
     public void OnDeviceLost()
@@ -122,6 +130,43 @@ public class PlayerController : MonoBehaviour
     public void OnRSelectRight(InputAction.CallbackContext ctx)
     {
 
+    }
+
+
+    void TrackStateTick()
+    {
+        if (!phys.isHitStop)
+        {
+            //always store state if moving (Rewind)
+            if ((Vector2)transform.position != prevState.position)
+            {
+                //reset static timer
+                staticTimer = 0;
+
+                PlayerState s = new PlayerState(transform.position.x, transform.position.y, phys.movePower, phys.rb.velocity);
+                prevStates.Enqueue(s);
+
+                //update prevState
+                prevState = s;
+            }
+            else
+            {
+                //store .1s of states when stationary
+                if (staticTimer <= .1f)
+                {
+                    PlayerState s = new PlayerState(transform.position.x, transform.position.y, phys.movePower, phys.rb.velocity);
+                    prevStates.Enqueue(s);
+                }
+                //track time spent standing still
+                staticTimer += Time.fixedDeltaTime;
+            }
+        }
+        
+        //prevent overfilling of prevStates queue
+        while(prevStates.Count > stats.rewindSize)
+        {
+            prevStates.Dequeue();
+        }
     }
 
 
