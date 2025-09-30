@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+//using System.Numerics;
 using System.Runtime.Serialization.Formatters;
+using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
@@ -10,6 +12,8 @@ using UnityEngine.UIElements;
 [RequireComponent(typeof(Collider2D), typeof(Collider2D))]
 public class PhysicsObj : MonoBehaviour
 {
+    LevelController lc;
+
     [HideInInspector] public Rigidbody2D rb;
     [HideInInspector] public Collider2D solidCol;
     [HideInInspector] public CircleCollider2D triggerCol;
@@ -75,6 +79,8 @@ public class PhysicsObj : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        lc = FindFirstObjectByType<LevelController>();
+
         rb = GetComponent<Rigidbody2D>();
 
         List<Collider2D> cols = new List<Collider2D>(GetComponents<Collider2D>());
@@ -91,6 +97,10 @@ public class PhysicsObj : MonoBehaviour
 
         //init prevPos list
         prevPos = new List<Vector2>(3);
+
+        //init terrain vars
+        TerrainContacts = new List<GroundTerrain>();
+        currentTerrain = lc.OOBTerrain; //init to OOBTerrain by defualt
 
 
     }
@@ -381,9 +391,12 @@ public class PhysicsObj : MonoBehaviour
 
                 //positional correction
                 ///previous position of each colliding physicsObj
-                Vector2 prev = prevPos[1];
-                Vector2 otherPrev = otherObj.prevPos[1];
+                
 
+                Vector2 prev = (prevPos.Count() > 1) ? prevPos[1] : transform.position;
+                Vector2 otherPrev = (otherObj.prevPos.Count() > 1) ? otherObj.prevPos[1] : otherObj.transform.position;
+                
+                
                 ///collision correction safety check
                 if ((prev - otherPrev).magnitude > triggerCol.radius + otherObj.triggerCol.radius)
                 {
@@ -1002,6 +1015,13 @@ public class PhysicsObj : MonoBehaviour
         //remove terrain from contacts list
         TerrainContacts.Remove(terrain);
 
+        //if not touching any terrain use OOB Terrain
+        if (TerrainContacts.Count() == 0)
+        {
+            currentTerrain = lc.OOBTerrain;
+            return;
+        }
+
         //if leaving current terrain - find+set new current terrain
         if (terrain == currentTerrain)
         {
@@ -1009,7 +1029,7 @@ public class PhysicsObj : MonoBehaviour
             int priority = -1;
             foreach (GroundTerrain t in TerrainContacts)
             {
-                if (t.stats.priority > priority)
+                if (t.stats.priority >= priority)
                 {
                     //set current terrain to that with highest priority
                     currentTerrain = t;

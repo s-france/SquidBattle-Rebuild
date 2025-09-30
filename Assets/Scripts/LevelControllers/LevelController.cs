@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class LevelController : MonoBehaviour
 {
     public string levelName;
+    public GroundTerrain OOBTerrain; //default "out of bounds" terrain to use when objs are not touching any terrain
     [HideInInspector] public PlayerManager pm;
 
     // Start is called before the first frame update
@@ -16,6 +17,8 @@ public class LevelController : MonoBehaviour
         //init important variables
         pm = FindFirstObjectByType<PlayerManager>();
         pm.lc = this;
+
+        OOBTerrain = GetComponent<GroundTerrain>();
 
         //default behavior:
         /* //not really needed rn -could be useful at some point to put default behaviors here

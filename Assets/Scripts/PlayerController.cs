@@ -53,6 +53,7 @@ public class PlayerController : MonoBehaviour
 
         //init prevStates queue to size of max rewind
         prevStates = new Queue<PlayerState>(stats.rewindSize);
+        prevState = new PlayerState(transform.position.x, transform.position.y, 0, Vector2.zero);
     }
 
     // Update is called once per frame
@@ -102,10 +103,7 @@ public class PlayerController : MonoBehaviour
 
     public void OnBBack(InputAction.CallbackContext ctx)
     {
-        if (ctx.performed)
-        {
-            pm.SummonPlayers(transform);
-        }
+        
         
 
     }

@@ -22,7 +22,7 @@ public class GroundTerrain : MonoBehaviour
     void OnTriggerEnter2D(Collider2D col)
     {
         //send terrain enter message to col gameobject
-        col.SendMessage("EnterTerrain", this);
+        col.SendMessage("EnterTerrain", this, SendMessageOptions.DontRequireReceiver);
 
 
     }
@@ -35,7 +35,7 @@ public class GroundTerrain : MonoBehaviour
     void OnTriggerExit2D(Collider2D col)
     {
         //send terrain exit message to col gameobject
-        col.SendMessage("ExitTerrain", this);
+        col.SendMessage("ExitTerrain", this, SendMessageOptions.DontRequireReceiver);
 
     }
 
@@ -43,7 +43,7 @@ public class GroundTerrain : MonoBehaviour
 
     public void TerrainEffect(PhysicsObj obj)
     {
-        
+
 
     }
     
