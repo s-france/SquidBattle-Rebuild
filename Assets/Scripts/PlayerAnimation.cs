@@ -30,7 +30,7 @@ public class PlayerAnimation : PhysicsObjAnimation
 
 
         //aim rotate
-        if (!pc.phys.isKnockback && !pc.phys.isMoving)
+        if (!pc.phys.isKnockback && !pc.phys.isMoving && !pc.isRewind)
         {
             RotatePlayer(pc.aim_move);
         }

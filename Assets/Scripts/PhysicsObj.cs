@@ -42,6 +42,7 @@ public class PhysicsObj : MonoBehaviour
     [HideInInspector] public Vector2 storedVelocity; //stored true velocity carried through hitstop
     [HideInInspector] public List<GroundTerrain> TerrainContacts;
     [HideInInspector] public GroundTerrain currentTerrain;
+    [HideInInspector] public int movepriority;
 
 
     //
@@ -214,9 +215,8 @@ public class PhysicsObj : MonoBehaviour
         //save previous position
         prevPos.Add(transform.position);
 
-
-
-
+        //update move priority
+        movepriority = CalcMovePrio(this);
     }
 
     //tick armor stats
@@ -270,6 +270,12 @@ public class PhysicsObj : MonoBehaviour
         {
             storedVelocity = direction.normalized;
         }
+
+        //get this man a true
+        isMoving = true;
+
+        //update move priority
+        movepriority = CalcMovePrio(this);
 
     }
 
@@ -386,7 +392,6 @@ public class PhysicsObj : MonoBehaviour
 
 
 
-
                 //physics process collision
 
                 //positional correction
@@ -402,9 +407,6 @@ public class PhysicsObj : MonoBehaviour
                 {
                     //correct collision position
                     var (pos, otherPos) = EstimateCircleTriggerCollision(triggerCol.radius * transform.localScale.x, otherObj.triggerCol.radius * otherObj.transform.localScale.x, transform.position, prev, otherObj.transform.position, otherPrev);
-
-                    //Debug.Log("newPos: " + pos);
-                    //Debug.Log("otherNewPos: " + otherPos);
 
                     transform.position = pos;
                     otherObj.transform.position = otherPos; //is this needed?
@@ -503,8 +505,10 @@ public class PhysicsObj : MonoBehaviour
         Vector2 otherVelocity = otherObj.isHitStop ? otherObj.storedVelocity : otherObj.rb.velocity;
 
         //move priorities
-        int mPrio = CalcMovePrio(this);
-        int otherMPrio = CalcMovePrio(otherObj);
+        int mPrio = movepriority;
+        int otherMPrio = otherObj.movepriority;
+
+
         //difference in priority
         int priorityDiff = mPrio - otherMPrio;
 
@@ -558,8 +562,7 @@ public class PhysicsObj : MonoBehaviour
 
         float strengthDiff = otherStrength - strength;
         float strengthRatio = otherStrength / strength;
-
-
+        
 
 
         //calc hitstop
@@ -940,6 +943,7 @@ public class PhysicsObj : MonoBehaviour
             mPrio = 1;
         }
 
+        
         return mPrio;
     }
 

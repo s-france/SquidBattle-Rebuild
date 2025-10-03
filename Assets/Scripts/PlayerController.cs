@@ -1,8 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using Mono.Cecil.Cil;
+using NUnit.Framework;
+using NUnit.Framework.Constraints;
 using UnityEditor.Callbacks;
+using UnityEditor.ShaderGraph.Internal;
+
 
 
 //using System.Numerics;
@@ -35,7 +41,14 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public float chargeTime = 0;
     [HideInInspector] public bool specialCharging = false;
     [HideInInspector] public float specialChargeTime = 0;
+    [HideInInspector] public bool isRewind = false;
+    [HideInInspector] public PlayerState RewindState; //current state of rewind
 
+    //
+
+    //item stuff
+    [HideInInspector] public List<ItemBehavior> ItemInventory; //currently held items
+    public int itemInventorySize = 1; //1 item by default
     //
 
 
@@ -54,6 +67,9 @@ public class PlayerController : MonoBehaviour
         //init prevStates queue to size of max rewind
         prevStates = new Queue<PlayerState>(stats.rewindSize);
         prevState = new PlayerState(transform.position.x, transform.position.y, 0, Vector2.zero);
+
+        //init items list
+        ItemInventory = new List<ItemBehavior>();
     }
 
     // Update is called once per frame
@@ -68,6 +84,8 @@ public class PlayerController : MonoBehaviour
         DITick();
 
         TrackStateTick();
+
+        RewindTick();
     }
 
     public void OnDeviceLost()
@@ -92,7 +110,7 @@ public class PlayerController : MonoBehaviour
         {
             chargePressed = false;
 
-            if (!phys.isKnockback && !phys.isHitStop)
+            if (!phys.isKnockback && !phys.isHitStop && !isRewind)
             {
                 phys.ApplyMove(false, Mathf.Clamp(chargeTime / stats.maxChargeTime, stats.minCharge, 1), aim_move);
             }
@@ -101,12 +119,39 @@ public class PlayerController : MonoBehaviour
 
     }
 
+    //🅱️ Button = specialCharge
     public void OnBBack(InputAction.CallbackContext ctx)
     {
-        
-        
+        if (ctx.performed)
+        {
+            specialChargePressed = true;
+        }
+        else if (ctx.canceled)
+        {
+            specialChargePressed = false;
+
+            //use helditem
+            if (!phys.isKnockback && !phys.isHitStop && !isRewind)
+            {
+                UseItem(ItemInventory[0]);
+            }
+
+        }
+
 
     }
+
+    public void UseItem(ItemBehavior item)
+    {
+        ItemInventory.Remove(item);
+        item.UseItem(specialChargeTime);
+        foreach (ItemBehavior i in ItemInventory)
+        {
+            int index = ItemInventory.IndexOf(i);
+            i.FollowPoint = transform.Find("FollowPoints").GetChild(index);
+        }
+    }
+
 
     public void OnLeftStickAim(InputAction.CallbackContext ctx)
     {
@@ -150,7 +195,7 @@ public class PlayerController : MonoBehaviour
             else
             {
                 //store .1s of states when stationary
-                if (staticTimer <= .1f)
+                if (staticTimer <= .07f)
                 {
                     PlayerState s = new PlayerState(transform.position.x, transform.position.y, phys.movePower, phys.rb.velocity);
                     prevStates.Enqueue(s);
@@ -159,9 +204,9 @@ public class PlayerController : MonoBehaviour
                 staticTimer += Time.fixedDeltaTime;
             }
         }
-        
+
         //prevent overfilling of prevStates queue
-        while(prevStates.Count > stats.rewindSize)
+        while (prevStates.Count > stats.rewindSize)
         {
             prevStates.Dequeue();
         }
@@ -171,6 +216,8 @@ public class PlayerController : MonoBehaviour
     //tracks player charging //runs in FixedUpdate()
     void ChargeTick()
     {
+
+        //normal charge
         if (chargePressed && !phys.isKnockback && !phys.isMoving)
         {
             //if (!isKnockback && !phys.isHitstop /*&& !isRewind*/ )
@@ -195,6 +242,18 @@ public class PlayerController : MonoBehaviour
             charging = false;
         }
 
+        //special charge
+        if (specialChargePressed && !phys.isKnockback && !phys.isMoving)
+        {
+            specialCharging = true;
+
+            specialChargeTime += Time.fixedDeltaTime;
+        }
+        else
+        {
+            specialChargeTime = 0;
+            specialCharging = false;
+        }
     }
 
 
@@ -354,8 +413,99 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    
-    
+    public IEnumerator Rewind(float charge = -1)
+    {
+        isRewind = true;
+        bool exitCondition = false;
 
+        Vector2 pos = Vector2.zero;
 
+        //disable solid collisions
+        phys.solidCol.enabled = false;
+
+        //apply bonus armor
+        phys.passiveArmor = 999;
+
+        int tickCount = 0;
+
+        //amount of ticks to rewind for (only used in item version)
+        int rewindTicks = (int)(charge / stats.maxChargeTime * stats.rewindSize);
+
+        //convert state queue to stack
+        Stack<PlayerState> states = new Stack<PlayerState>(prevStates.ToArray());
+
+        while (exitCondition == false && states.Count > 0)
+        {
+
+            if (!phys.isHitStop)
+            {
+                RewindState = states.Pop();
+                pos.x = RewindState.xPos;
+                pos.y = RewindState.yPos;
+
+                phys.rb.MovePosition(pos);
+                phys.storedVelocity = -RewindState.velocity;
+                phys.rb.velocity = -RewindState.velocity;
+                phys.movePower = Mathf.Clamp(RewindState.movePower, phys.stats.maxMovePower / 5, 999); //minimum movepower for rewind = maxmovepower/5
+                phys.movepriority = 4; //invulnerable priority
+
+                //rotate animate
+                if (RewindState.velocity.magnitude != 0)
+                {
+                    animate.RotatePlayer(RewindState.velocity.normalized);
+                }
+
+                //increment tick count
+                tickCount++;
+            }
+
+            //apply bonus armor
+            phys.passiveArmor = 999;
+
+            //check exit condition
+            //OOB Recall condition
+            if (charge == -1)
+            {
+                //check if inbounds
+                //exitCondition =
+            }
+            else //item
+            {
+                exitCondition = (tickCount >= rewindTicks);
+            }
+
+            yield return fuWait;
+        }
+
+        //reset to normal armor val
+        phys.passiveArmor = phys.stats.maxPassiveArmor;
+
+        //exit rewind state
+        isRewind = false;
+        //reenable collisions
+        phys.solidCol.enabled = true;
+    }
+
+    void RewindTick()
+    {
+        if (isRewind && !phys.isHitStop)
+        {
+            Vector2 pos = Vector2.zero;
+            pos.x = RewindState.xPos;
+            pos.y = RewindState.yPos;
+
+            phys.rb.MovePosition(pos);
+            phys.storedVelocity = -RewindState.velocity;
+            phys.rb.velocity = -RewindState.velocity;
+            phys.movePower = Mathf.Clamp(RewindState.movePower, phys.stats.maxMovePower / 5, 999); //minimum movepower for rewind = maxmovepower/5
+            phys.movepriority = 4; //invulnerable priority
+
+            //rotate animate
+            if (RewindState.velocity.magnitude != 0)
+            {
+                animate.RotatePlayer(RewindState.velocity.normalized);
+            }
+        }
+        
+    }
 }
