@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 //using System.Numerics;
 using System.Runtime.Serialization.Formatters;
+using NUnit.Framework.Internal;
 using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.Events;
@@ -197,6 +198,9 @@ public class PhysicsObj : MonoBehaviour
                 //continue whatever movement is stored
                 rb.velocity = storedVelocity;
             }
+
+            //NEED TO TEST THIS!!!:
+            //storedVelocity = rb.velocity;
 
             isHitStop = false;
         }

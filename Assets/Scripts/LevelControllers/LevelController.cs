@@ -5,18 +5,20 @@ using UnityEngine.InputSystem;
 
 public class LevelController : MonoBehaviour
 {
+    public static LevelController Instance { get; private set; }
+
     public string levelName;
     public GroundTerrain OOBTerrain; //default "out of bounds" terrain to use when objs are not touching any terrain
-    [HideInInspector] public PlayerManager pm;
 
     // Start is called before the first frame update
     public virtual void Start()
     {
         Debug.Log("LevelController Start!");
 
+        Instance = this;
+
         //init important variables
-        pm = FindFirstObjectByType<PlayerManager>();
-        pm.lc = this;
+        //PlayerManager.Instance.lc = this;
 
         OOBTerrain = GetComponent<GroundTerrain>();
 

@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b96a2393ec2da4c07a43d84d91fecbf3, type: 3}
-  m_Name: DefaultGroundTerrainStats
+  m_Name: PlatformGroundTerrainStats
   m_EditorClassIdentifier: 
   priority: 1
-  isCheckPoint: 1
+  isCheckPoint: 0
   damage: 0
   traction: 1
   timeMod: 1

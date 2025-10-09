@@ -22,8 +22,6 @@ public class PlayerManager : MonoBehaviour
 
     [HideInInspector] public List<int> TakenColors; //list of taken colors
 
-    [HideInInspector] public LevelController lc; //current scene's LevelController (updated by LC)
-
     [HideInInspector] public List<PlayerInput> PlayerList;
     [HideInInspector] public List<Team> Teams;
 
@@ -51,8 +49,6 @@ public class PlayerManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(Instance);
 
-            //set levelcontroller (future lc's set by lc in scene)
-            lc = FindFirstObjectByType<LevelController>();
 
             CameraTG = FindFirstObjectByType<CinemachineTargetGroup>();
 
@@ -248,7 +244,6 @@ public class PlayerManager : MonoBehaviour
 
         PlayerData player = pi.GetComponent<PlayerData>();
 
-        player.pm = this;
 
         //set PlayerManager as player obj's parent
         pi.transform.parent = transform;
@@ -268,7 +263,15 @@ public class PlayerManager : MonoBehaviour
         SetColor(player, FindNextAvailableColor(pi.playerIndex, 1));
 
         //run LevelController player join behavior
-        lc.OnPlayerJoin(pi);
+        if (LevelController.Instance != null)
+        {
+            LevelController.Instance.OnPlayerJoin(pi);
+        }
+        else
+        {
+            GameObject.FindFirstObjectByType<LevelController>().OnPlayerJoin(pi);
+        }
+
     }
 
     //called when player leave event triggered
@@ -286,7 +289,7 @@ public class PlayerManager : MonoBehaviour
         LeaveTeam(pi.GetComponent<PlayerData>());
 
         //trigger lc player leave behavior
-        lc.OnPlayerLeave(pi);
+        LevelController.Instance.OnPlayerLeave(pi);
 
     }
 

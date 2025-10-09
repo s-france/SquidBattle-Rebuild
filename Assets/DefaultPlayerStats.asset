@@ -356,7 +356,8 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   OOBMoveMod: 0.1
+  maxStamina: 1.5
   inventorySize: 1
-  rewindSize: 300
+  rewindSize: 600
   summonAccel: 3
   summonSpeed: 2

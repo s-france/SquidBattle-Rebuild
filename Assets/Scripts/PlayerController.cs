@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
 using Mono.Cecil.Cil;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
@@ -19,7 +20,6 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     WaitForFixedUpdate fuWait; //used in FixedUpdate coroutines
-    PlayerManager pm;
 
     public PhysicsObj phys;
     PlayerAnimation animate;
@@ -43,6 +43,8 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public float specialChargeTime = 0;
     [HideInInspector] public bool isRewind = false;
     [HideInInspector] public PlayerState RewindState; //current state of rewind
+    [HideInInspector] public float stamina;// = stats.maxStamina;
+    [HideInInspector] public PlayerState lastCheckPoint;
 
     //
 
@@ -52,13 +54,17 @@ public class PlayerController : MonoBehaviour
     //
 
 
+    public static int test;
+
+
     // Start is called before the first frame update
     void Start()
     {
+        //init fuWait for coroutines
         fuWait = new WaitForFixedUpdate();
 
-        pm = FindFirstObjectByType<PlayerManager>();
 
+        //get gameobj component references
         phys = GetComponent<PhysicsObj>();
         animate = GetComponent<PlayerAnimation>();
         pi = GetComponent<PlayerInput>();
@@ -66,7 +72,13 @@ public class PlayerController : MonoBehaviour
 
         //init prevStates queue to size of max rewind
         prevStates = new Queue<PlayerState>(stats.rewindSize);
-        prevState = new PlayerState(transform.position.x, transform.position.y, 0, Vector2.zero);
+        prevState = new PlayerState(transform.position.x, transform.position.y, 0, Vector2.zero, phys.currentTerrain);
+
+        //init checkpoint to spawn pos
+        lastCheckPoint = new PlayerState(transform.position.x, transform.position.y, 0, Vector2.zero, phys.currentTerrain);
+
+        //init stamina
+        stamina = stats.maxStamina;
 
         //init items list
         ItemInventory = new List<ItemBehavior>();
@@ -91,7 +103,7 @@ public class PlayerController : MonoBehaviour
     public void OnDeviceLost()
     {
         Debug.Log("P" + pi.playerIndex + " device lost!");
-        pm.LeaveTeam(data);
+        PlayerManager.Instance.LeaveTeam(data);
 
         //unpair device completely cuz we are NOT using lost devices/regained events
         pi.user.UnpairDevices();
@@ -178,6 +190,8 @@ public class PlayerController : MonoBehaviour
 
     void TrackStateTick()
     {
+        //
+        //Rewind States Tracking
         if (!phys.isHitStop)
         {
             //always store state if moving (Rewind)
@@ -186,7 +200,7 @@ public class PlayerController : MonoBehaviour
                 //reset static timer
                 staticTimer = 0;
 
-                PlayerState s = new PlayerState(transform.position.x, transform.position.y, phys.movePower, phys.rb.velocity);
+                PlayerState s = new PlayerState(this);
                 prevStates.Enqueue(s);
 
                 //update prevState
@@ -194,10 +208,10 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                //store .1s of states when stationary
+                //store .07s of states when stationary
                 if (staticTimer <= .07f)
                 {
-                    PlayerState s = new PlayerState(transform.position.x, transform.position.y, phys.movePower, phys.rb.velocity);
+                    PlayerState s = new PlayerState(this);
                     prevStates.Enqueue(s);
                 }
                 //track time spent standing still
@@ -210,6 +224,35 @@ public class PlayerController : MonoBehaviour
         {
             prevStates.Dequeue();
         }
+        //
+        //
+
+        //
+        //CheckPoint Tracking
+
+
+        //
+        //
+
+
+        //
+        //Stamina State Tracking
+        if (phys.currentTerrain == LevelController.Instance.OOBTerrain)
+        {
+            stamina = Mathf.Clamp(stamina - Time.deltaTime, 0, stats.maxStamina);
+        }
+        else
+        {
+            stamina = Mathf.Clamp(stamina + Time.deltaTime, 0, stats.maxStamina);
+        }
+
+        if (stamina <= 0 && !isRewind)
+        {
+            StartCoroutine(Rewind());
+        }
+
+        //
+        //
     }
 
 
@@ -415,6 +458,16 @@ public class PlayerController : MonoBehaviour
 
     public IEnumerator Rewind(float charge = -1)
     {
+        //convert state queue to stack
+        Stack<PlayerState> states = new Stack<PlayerState>(prevStates.ToArray());
+
+        //clear any immediate stationary frames for more responsive startup
+        while (states.Pop().position == (Vector2)transform.position)
+        {
+            //waiting
+        }
+
+
         isRewind = true;
         bool exitCondition = false;
 
@@ -427,12 +480,11 @@ public class PlayerController : MonoBehaviour
         phys.passiveArmor = 999;
 
         int tickCount = 0;
+        float checkPointTime = 0; //for OOB Recall exit case
 
         //amount of ticks to rewind for (only used in item version)
         int rewindTicks = (int)(charge / stats.maxChargeTime * stats.rewindSize);
 
-        //convert state queue to stack
-        Stack<PlayerState> states = new Stack<PlayerState>(prevStates.ToArray());
 
         while (exitCondition == false && states.Count > 0)
         {
@@ -440,6 +492,17 @@ public class PlayerController : MonoBehaviour
             if (!phys.isHitStop)
             {
                 RewindState = states.Pop();
+
+                //skip still frames if OOB recovery rewind
+                if (charge == -1)
+                {
+                    while (RewindState.position == (Vector2)transform.position)
+                    {
+                        //clear still frames
+                        RewindState = states.Pop();
+                    }
+                }
+
                 pos.x = RewindState.xPos;
                 pos.y = RewindState.yPos;
 
@@ -467,7 +530,18 @@ public class PlayerController : MonoBehaviour
             if (charge == -1)
             {
                 //check if inbounds
-                //exitCondition =
+                if (phys.currentTerrain.stats.isCheckPoint)
+                {
+                    checkPointTime += Time.fixedDeltaTime;
+                }
+                else
+                {
+                    checkPointTime = 0;
+                }
+
+                //exit when inbounds for > .6sec
+                exitCondition = checkPointTime >= .6f;
+
             }
             else //item
             {
@@ -506,6 +580,40 @@ public class PlayerController : MonoBehaviour
                 animate.RotatePlayer(RewindState.velocity.normalized);
             }
         }
-        
     }
+
+    //called when exiting a piece of ground terrain
+    public void ExitTerrain(GroundTerrain terrain)
+    {
+        //if exiting a checkpoint zone
+        if (terrain.stats.isCheckPoint && !phys.currentTerrain.stats.isCheckPoint)
+        {
+            //update checkpoint to current pos
+            lastCheckPoint.xPos = transform.position.x;
+            lastCheckPoint.yPos = transform.position.y;
+
+
+            //FINISH THIS: replace current pos with Rewind ~ .7sec
+
+            float timer = 0;
+            //create temp stack to find previous state
+            Stack<PlayerState> previous = new Stack<PlayerState>(prevStates);
+            while (timer < .7f)
+            {
+                //FINISH THIS HERE!!!!
+                //count frames in checkpoint terrain
+                if (previous.Pop().Terrain.stats.isCheckPoint)
+                {
+                    timer += Time.fixedDeltaTime;
+                }
+                else //reset if not in checkpoint > .7fsec
+                {
+                    timer = 0;
+                }
+            }
+
+
+        }
+    }
+
 }

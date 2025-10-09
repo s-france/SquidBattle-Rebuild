@@ -22,13 +22,14 @@ public class PlayerStats : PhysicsStats
     public AnimationCurve glideDeccelDICurve;
     public float OOBMoveMod;
 
+    //stamina
+    public float maxStamina;
+
     //items    
     public int inventorySize;
     public int rewindSize;
 
     //summoning stats
-    //public float summonTime;
-
     public float summonAccel;
     public float summonSpeed;
 

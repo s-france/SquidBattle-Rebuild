@@ -6,7 +6,6 @@ using UnityEngine.InputSystem;
 
 public class CSSPlayerController : MonoBehaviour
 {
-    PlayerManager pm;
     PlayerData data;
     CSSLevelController lc;
 
@@ -18,7 +17,6 @@ public class CSSPlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        pm = FindFirstObjectByType<PlayerManager>();
         lc = FindFirstObjectByType<CSSLevelController>();
         data = GetComponent<PlayerData>();
 
@@ -46,7 +44,7 @@ public class CSSPlayerController : MonoBehaviour
     {
         if (ctx.performed && !isReady)
         {
-            pm.SetColor(data, pm.FindNextAvailableColor(data.colorIdx, -1));
+            PlayerManager.Instance.SetColor(data, PlayerManager.Instance.FindNextAvailableColor(data.colorIdx, -1));
 
         }
 
@@ -56,7 +54,7 @@ public class CSSPlayerController : MonoBehaviour
     {
         if (ctx.performed && !isReady)
         {
-            pm.SetColor(data, pm.FindNextAvailableColor(data.colorIdx, 1));
+            PlayerManager.Instance.SetColor(data, PlayerManager.Instance.FindNextAvailableColor(data.colorIdx, 1));
 
         }
 

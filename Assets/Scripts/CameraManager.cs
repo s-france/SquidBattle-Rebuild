@@ -6,7 +6,6 @@ using System.Linq;
 
 public class CameraManager : MonoBehaviour
 {
-    [HideInInspector] public PlayerManager pm;
     List<CinemachineVirtualCamera> Cameras; //list of vCams in scene
     public CinemachineVirtualCamera ActiveCam; //currently active vCam
     public CinemachineVirtualCamera DefaultCam; //camera to default to when not in a camerazone (TargetGroupCam in most cases)
@@ -17,7 +16,6 @@ public class CameraManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        pm = FindFirstObjectByType<PlayerManager>();
 
 
         //fill camera list

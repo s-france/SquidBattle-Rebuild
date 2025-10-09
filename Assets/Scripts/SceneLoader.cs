@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 public class SceneLoader : MonoBehaviour
 {
     bool loading;
-    PlayerManager pm;
 
 
     // Start is called before the first frame update
@@ -26,7 +25,6 @@ public class SceneLoader : MonoBehaviour
     {
         Debug.Log("SCENE LOADER AWAKE!!");
         
-        pm = GetComponent<PlayerManager>();
 
         loading = false;
 
@@ -39,7 +37,7 @@ public class SceneLoader : MonoBehaviour
             loading = true;
 
             //run LevelController EndLevel() function
-            pm.lc.EndLevel();
+            LevelController.Instance.EndLevel();
         
 
             var scene = SceneManager.LoadSceneAsync(sceneName);

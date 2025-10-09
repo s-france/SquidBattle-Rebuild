@@ -6,7 +6,6 @@ using UnityEngine.InputSystem;
 //Important organizational level data for a single player
 public class PlayerData : MonoBehaviour
 {
-    [HideInInspector] public PlayerManager pm;
     public PlayerInput pi; //use pi.playerIndex for true indexing!
 
     public SpriteRenderer BodySprite;
@@ -25,7 +24,6 @@ public class PlayerData : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        pm = FindFirstObjectByType<PlayerManager>();
         pi = GetComponent<PlayerInput>();
 
     }
@@ -41,7 +39,7 @@ public class PlayerData : MonoBehaviour
     //sets all player assets to current color
     public void SetColor()
     {
-        BodySprite.color = pm.PlayerColors.Colors[colorIdx];
+        BodySprite.color = PlayerManager.Instance.PlayerColors.Colors[colorIdx];
 
     }
 }

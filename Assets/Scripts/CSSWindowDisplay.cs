@@ -7,7 +7,6 @@ using UnityEngine.UI;
 //sets UI display of a CSS PLayer Window
 public class CSSWindowDisplay : MonoBehaviour
 {
-    PlayerManager pm;
 
     [HideInInspector] public int playerIdx = -1; //idx of player assigned to this window
 
@@ -21,8 +20,6 @@ public class CSSWindowDisplay : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //get PlayerManager
-        pm =FindFirstObjectByType<PlayerManager>();
 
         //init to join state by default
         LeavePlayer();

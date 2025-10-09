@@ -33,7 +33,7 @@ public class CameraZone : MonoBehaviour
             contents.Add(pc);
 
             //check if contains all players
-            foreach (PlayerInput pi in cm.pm.PlayerList)
+            foreach (PlayerInput pi in PlayerManager.Instance.PlayerList)
             {
                 if (!contents.Contains(pi.GetComponent<PlayerController>()))
                 {

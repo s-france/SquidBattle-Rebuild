@@ -15,7 +15,7 @@ public class CSSLevelController : MenuLevelController
         //PlayerWindows = FindObjectsByType<CSSWindowDisplay>(FindObjectsSortMode.None);
 
 
-        foreach (PlayerInput p in pm.PlayerList)
+        foreach (PlayerInput p in PlayerManager.Instance.PlayerList)
         {
             //set all players input actionmaps to CharacterSelect
             p.SwitchCurrentActionMap("CharacterSelect");

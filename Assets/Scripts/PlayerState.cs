@@ -12,7 +12,9 @@ public class PlayerState
     public float movePower;
     public Vector2 velocity;
 
-    public PlayerState(float xPos, float yPos, float movePower, Vector2 velocity)
+    public GroundTerrain Terrain;
+
+    public PlayerState(float xPos, float yPos, float movePower, Vector2 velocity, GroundTerrain terrain)
     {
         this.xPos = xPos;
         this.yPos = yPos;
@@ -22,6 +24,21 @@ public class PlayerState
         this.movePower = movePower;
         this.velocity = velocity;
 
+        this.Terrain = terrain;
+    }
+
+    public PlayerState(PlayerController pc)
+    {
+        this.xPos = pc.transform.position.x;
+        this.yPos = pc.transform.position.y;
+
+        this.position = pc.transform.position;
+
+        this.movePower = pc.phys.movePower;
+        //ADD STOREDVELOCITY CHECK HERE
+        this.velocity = pc.phys.rb.velocity;
+
+        this.Terrain = pc.phys.currentTerrain;
     }
 
     public override string ToString()
