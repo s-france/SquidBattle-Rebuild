@@ -15,6 +15,8 @@ using UnityEditor.ShaderGraph.Internal;
 //using System.Numerics;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.TestTools;
+using UnityEngine.UIElements;
 
 //🐙
 public class PlayerController : MonoBehaviour
@@ -41,10 +43,12 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public float chargeTime = 0;
     [HideInInspector] public bool specialCharging = false;
     [HideInInspector] public float specialChargeTime = 0;
-    [HideInInspector] public bool isRewind = false;
+    [HideInInspector] public bool isRewind = false; //rewind state
+    [HideInInspector] public bool isRecall = false; //hub world recovery state
     [HideInInspector] public PlayerState RewindState; //current state of rewind
     [HideInInspector] public float stamina;// = stats.maxStamina;
     [HideInInspector] public PlayerState lastCheckPoint;
+    [HideInInspector] public float checkPointTimer = 0; //time since last checkpoint update
 
     //
 
@@ -125,6 +129,12 @@ public class PlayerController : MonoBehaviour
             if (!phys.isKnockback && !phys.isHitStop && !isRewind)
             {
                 phys.ApplyMove(false, Mathf.Clamp(chargeTime / stats.maxChargeTime, stats.minCharge, 1), aim_move);
+
+                //update checkpoint status
+                if (phys.currentTerrain.stats.isCheckPoint)
+                {
+                    SetCheckPoint();
+                }
             }
 
         }
@@ -219,6 +229,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+
         //prevent overfilling of prevStates queue
         while (prevStates.Count > stats.rewindSize)
         {
@@ -229,26 +240,41 @@ public class PlayerController : MonoBehaviour
 
         //
         //CheckPoint Tracking
+        //update checkpoint status if 
+        if (!phys.isMoving && phys.currentTerrain.stats.isCheckPoint)
+        {
+            SetCheckPoint();
+        }
 
-
+        //tick last checkpoint timer
+        checkPointTimer += Time.fixedDeltaTime;
         //
         //
 
 
         //
-        //Stamina State Tracking
-        if (phys.currentTerrain == LevelController.Instance.OOBTerrain)
+        //OOB + Stamina State Tracking
+        if (phys.currentTerrain == LevelController.Instance.OOBTerrain) //Out of Bounds
         {
             stamina = Mathf.Clamp(stamina - Time.deltaTime, 0, stats.maxStamina);
         }
         else
         {
+
             stamina = Mathf.Clamp(stamina + Time.deltaTime, 0, stats.maxStamina);
         }
 
-        if (stamina <= 0 && !isRewind)
+        if (stamina <= 0 && !isRecall)
         {
-            StartCoroutine(Rewind());
+            if (checkPointTimer <= 2) //amount of time to rewind vs summons recall
+            {
+                StartCoroutine(Rewind());
+            }
+            else
+            {
+                StartCoroutine(SummonPlayer(lastCheckPoint.position));
+            }
+
         }
 
         //
@@ -424,7 +450,7 @@ public class PlayerController : MonoBehaviour
     }
 
     //coroutine to summon/warp player to a position (used in hub world transitions)
-    public IEnumerator SummonPlayer(Transform summonPoint)
+    public IEnumerator SummonPlayer(Vector2 summonPoint)
     {
         //disable collision while summoning
         phys.solidCol.enabled = false;
@@ -432,23 +458,29 @@ public class PlayerController : MonoBehaviour
 
         float accelRate;
 
+        //enter recall state
+        isRecall = true;
+
 
         float timer = 0; //summon timeout timer
 
         //try to get to position / timeout after 2 sec
-        while (transform.position != summonPoint.position && timer < 2f)
+        while ((Vector2)transform.position != summonPoint && timer < 2f)
         {
             //acceleration based on distance
-            accelRate = stats.summonAccel * (transform.position - summonPoint.position).magnitude;
+            accelRate = stats.summonAccel * ((Vector2)transform.position - summonPoint).magnitude;
 
             //move toward summon point
-            phys.rb.MovePosition(Vector2.MoveTowards(transform.position, summonPoint.position, stats.summonSpeed * accelRate * Time.fixedDeltaTime));
+            phys.rb.MovePosition(Vector2.MoveTowards(transform.position, summonPoint, stats.summonSpeed * accelRate * Time.fixedDeltaTime));
 
             timer += Time.fixedDeltaTime;
 
 
             yield return fuWait;
         }
+
+        //exit recall state
+        isRecall = false;
 
         //reenable collision
         phys.solidCol.enabled = true;
@@ -467,7 +499,15 @@ public class PlayerController : MonoBehaviour
             //waiting
         }
 
+        //lock into recall state
+        if (charge == -1)
+        {
+            isRecall = true;
+        }
 
+        Vector2 checkPoint = lastCheckPoint.position;
+
+        //enter rewind state
         isRewind = true;
         bool exitCondition = false;
 
@@ -480,7 +520,6 @@ public class PlayerController : MonoBehaviour
         phys.passiveArmor = 999;
 
         int tickCount = 0;
-        float checkPointTime = 0; //for OOB Recall exit case
 
         //amount of ticks to rewind for (only used in item version)
         int rewindTicks = (int)(charge / stats.maxChargeTime * stats.rewindSize);
@@ -529,19 +568,7 @@ public class PlayerController : MonoBehaviour
             //OOB Recall condition
             if (charge == -1)
             {
-                //check if inbounds
-                if (phys.currentTerrain.stats.isCheckPoint)
-                {
-                    checkPointTime += Time.fixedDeltaTime;
-                }
-                else
-                {
-                    checkPointTime = 0;
-                }
-
-                //exit when inbounds for > .6sec
-                exitCondition = checkPointTime >= .6f;
-
+                exitCondition = (Vector2)transform.position == checkPoint;
             }
             else //item
             {
@@ -556,6 +583,8 @@ public class PlayerController : MonoBehaviour
 
         //exit rewind state
         isRewind = false;
+        //exit recall state
+        isRecall = false;
         //reenable collisions
         phys.solidCol.enabled = true;
     }
@@ -585,13 +614,14 @@ public class PlayerController : MonoBehaviour
     //called when exiting a piece of ground terrain
     public void ExitTerrain(GroundTerrain terrain)
     {
+        /*
+
         //if exiting a checkpoint zone
         if (terrain.stats.isCheckPoint && !phys.currentTerrain.stats.isCheckPoint)
         {
             //update checkpoint to current pos
             lastCheckPoint.xPos = transform.position.x;
             lastCheckPoint.yPos = transform.position.y;
-
 
             //FINISH THIS: replace current pos with Rewind ~ .7sec
 
@@ -612,8 +642,19 @@ public class PlayerController : MonoBehaviour
                 }
             }
 
+            PlayerState s = previous.Pop();
 
         }
+
+        */
+    }
+
+
+    //sets a new checkpoint at current position
+    public void SetCheckPoint()
+    {
+        lastCheckPoint.Set(this);
+        checkPointTimer = 0;
     }
 
 }

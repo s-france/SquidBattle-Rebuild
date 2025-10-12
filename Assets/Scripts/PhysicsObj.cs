@@ -21,7 +21,7 @@ public class PhysicsObj : MonoBehaviour
 
     public PhysicsStats stats; //base stats reference for this physics obj
 
-    public UnityEvent<GameObject, GameObject> SolidColission;
+    //public UnityEvent<GameObject, GameObject> SolidColission;
 
 
     List<Collider2D> Collisions; //list of all colliders currently touching triggerCol
@@ -79,7 +79,7 @@ public class PhysicsObj : MonoBehaviour
 
 
     // Start is called before the first frame update
-    void Start()
+    public void Start()
     {
         lc = FindFirstObjectByType<LevelController>();
 
@@ -123,7 +123,7 @@ public class PhysicsObj : MonoBehaviour
 
     //runs in FixedUpdate()
     //processes movement
-    void MovementTick()
+    public virtual void MovementTick()
     {
         if (!isHitStop)
         {
@@ -498,11 +498,11 @@ public class PhysicsObj : MonoBehaviour
         StartCoroutine(Knockback(otherObj));
     }
 
-    public IEnumerator Knockback(PhysicsObj otherObj)
+    public virtual IEnumerator Knockback(PhysicsObj otherObj)
     {
         //THIS IS SUS:
         //baseline peer intangibility to prevent double collisions
-        SetPeerPriority(IntangiblePeerPrioTable, otherObj, .1f);
+        SetPeerPriority(IntangiblePeerPrioTable, otherObj, .2f);
 
         //true velocity at impact
         Vector2 velocity = isHitStop ? storedVelocity : rb.velocity;

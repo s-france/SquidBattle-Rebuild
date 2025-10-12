@@ -372,7 +372,7 @@ public class PlayerManager : MonoBehaviour
 
 
     
-    public void SummonPlayers(Transform summonPoint)
+    public void SummonPlayers(Vector2 summonPoint)
     {
         foreach (PlayerInput p in PlayerList)
         {

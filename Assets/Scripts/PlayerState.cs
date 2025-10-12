@@ -41,6 +41,21 @@ public class PlayerState
         this.Terrain = pc.phys.currentTerrain;
     }
 
+    public void Set(PlayerController pc)
+    {
+        this.xPos = pc.transform.position.x;
+        this.yPos = pc.transform.position.y;
+
+        this.position = pc.transform.position;
+
+        this.movePower = pc.phys.movePower;
+        //ADD STOREDVELOCITY CHECK HERE
+        this.velocity = pc.phys.rb.velocity;
+
+        this.Terrain = pc.phys.currentTerrain;
+
+    }
+
     public override string ToString()
     {
         return "position: (" + xPos + ", " + yPos + "), power: " + movePower + ", velocity: " + velocity;
