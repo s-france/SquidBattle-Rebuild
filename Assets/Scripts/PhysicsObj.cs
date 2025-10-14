@@ -51,11 +51,11 @@ public class PhysicsObj : MonoBehaviour
     //current movement state numbers
     [HideInInspector] public float moveSpeed = 0;
 
-    float moveTime = 0;
+    [HideInInspector] public float moveTime = 0;
 
     [HideInInspector] public float movePower = 0;
 
-    float moveTimer = 0;
+    [HideInInspector] public float moveTimer = 0;
 
 
     //glide modifiers
@@ -199,8 +199,8 @@ public class PhysicsObj : MonoBehaviour
                 rb.velocity = storedVelocity;
             }
 
-            //NEED TO TEST THIS!!!:
-            //storedVelocity = rb.velocity;
+            //update stored velocity
+            storedVelocity = rb.velocity;
 
             isHitStop = false;
         }

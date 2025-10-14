@@ -358,6 +358,6 @@ MonoBehaviour:
   OOBMoveMod: 0.1
   maxStamina: 1.5
   inventorySize: 1
-  rewindSize: 600
+  rewindSize: 400
   summonAccel: 2
   summonSpeed: 1

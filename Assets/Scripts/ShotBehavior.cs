@@ -24,9 +24,10 @@ public class ShotBehavior : ItemBehavior
 
         //give user initial intangibiilty frames from the Shot
         ShotObj.SetPeerPriority(ShotObj.IntangiblePeerPrioTable, pc.phys, .5f);
+        pc.phys.SetPeerPriority(pc.phys.IntangiblePeerPrioTable, ShotObj, .5f);
 
         //launch Shot projectile
-        ShotObj.ApplyMove(false, charge, pc.aim_move);
+        ShotObj.ApplyMove(false, charge, pc.aim_move.normalized);
 
         //apply recoil to player
         pc.phys.ApplyMove(false, .5f * charge, -pc.aim_move);

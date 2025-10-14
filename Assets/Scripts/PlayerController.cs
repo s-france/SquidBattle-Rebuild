@@ -126,7 +126,7 @@ public class PlayerController : MonoBehaviour
         {
             chargePressed = false;
 
-            if (!phys.isKnockback && !phys.isHitStop && !isRewind)
+            if (!phys.isKnockback && !phys.isHitStop && !isRewind && phys.moveTimer/phys.moveTime > .4f)
             {
                 phys.ApplyMove(false, Mathf.Clamp(chargeTime / stats.maxChargeTime, stats.minCharge, 1), aim_move);
 
@@ -287,7 +287,7 @@ public class PlayerController : MonoBehaviour
     {
 
         //normal charge
-        if (chargePressed && !phys.isKnockback && !phys.isMoving)
+        if (chargePressed && !phys.isKnockback && !phys.isMoving && !isRewind)
         {
             //if (!isKnockback && !phys.isHitstop /*&& !isRewind*/ )
             //{
@@ -312,7 +312,7 @@ public class PlayerController : MonoBehaviour
         }
 
         //special charge
-        if (specialChargePressed && !phys.isKnockback && !phys.isMoving)
+        if (specialChargePressed && !phys.isKnockback && !phys.isMoving && !isRewind)
         {
             specialCharging = true;
 
