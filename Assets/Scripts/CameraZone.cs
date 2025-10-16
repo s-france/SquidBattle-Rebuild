@@ -11,7 +11,7 @@ public class CameraZone : MonoBehaviour
     [HideInInspector] public CameraManager cm;
     [HideInInspector] public CinemachineVirtualCamera cam;
     Collider2D zoneTrigger;
-    List<PlayerController> contents; //players in this zone
+    [HideInInspector] public List<PlayerController> contents; //players in this zone
 
     // Start is called before the first frame update
     public virtual void Start()
@@ -58,7 +58,10 @@ public class CameraZone : MonoBehaviour
             contents.Remove(pc);
 
             //set active cam to TargetGroup
-            cm.SetActiveCam(cm.DefaultCam);
+            //cm.SetActiveCam(cm.DefaultCam);
+
+            //search for new camera zone - or set to default cam if non found
+            cm.FindBestCameraZone();
 
 
 

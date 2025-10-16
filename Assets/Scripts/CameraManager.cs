@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 using System.Linq;
+using UnityEngine.InputSystem;
 
 public class CameraManager : MonoBehaviour
 {
-    List<CinemachineVirtualCamera> Cameras; //list of vCams in scene
+    List<CinemachineVirtualCamera> Cameras; //list of all vCams in scene
+    List<CameraZone> CamZones; //list of zone cameras in scene
+
     public CinemachineVirtualCamera ActiveCam; //currently active vCam
     public CinemachineVirtualCamera DefaultCam; //camera to default to when not in a camerazone (TargetGroupCam in most cases)
 
@@ -19,8 +22,9 @@ public class CameraManager : MonoBehaviour
 
 
         //fill camera list
-        Cameras = new List<CinemachineVirtualCamera>();
+        //Cameras = new List<CinemachineVirtualCamera>();
         Cameras = GetComponentsInChildren<CinemachineVirtualCamera>().ToList<CinemachineVirtualCamera>();
+        CamZones = GetComponentsInChildren<CameraZone>().ToList<CameraZone>();
 
         SetActiveCam(ActiveCam);
     }
@@ -54,6 +58,44 @@ public class CameraManager : MonoBehaviour
         SetActiveCam(cam);
 
         isOverride = true;
+    }
+
+    //searches for any camera zone containing all players
+    public void FindBestCameraZone()
+    {
+        bool foundCam = false;
+
+        foreach (CameraZone zone in CamZones)
+        {
+            bool validZone = true;
+
+            //check if zone contains all players
+            foreach (PlayerInput pi in PlayerManager.Instance.PlayerList)
+            {
+                if (!zone.contents.Contains(pi.GetComponent<PlayerController>()))
+                {
+                    validZone = false;
+                    break;
+                }
+            }
+
+            if (validZone)
+            {
+                //if found a zone that does contain all players - set as active cam zone
+                SetActiveCam(zone.GetComponent<CinemachineVirtualCamera>());
+                foundCam = true;
+                break;
+            }
+        }
+
+
+        //set deafult cam if no valid camzone is found
+        if (!foundCam)
+        {
+            SetActiveCam(DefaultCam);
+        }
+
+
     }
     
 

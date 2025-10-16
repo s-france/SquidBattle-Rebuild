@@ -22,6 +22,8 @@ public class DashPad : MonoBehaviour
     {
         if(col.TryGetComponent<PhysicsObj>(out PhysicsObj otherObj))
         {
+            gameObject.SendMessageUpwards("DashPadEntered", this, SendMessageOptions.DontRequireReceiver);
+
             otherObj.transform.position = transform.position;
 
             otherObj.ApplyMove(false, launchForce, transform.right);
