@@ -1053,6 +1053,19 @@ public class PhysicsObj : MonoBehaviour
 
     }
 
-    
+    public void DisableCollision()
+    {
+        solidCol.enabled = false;
+        triggerCol.enabled = false;
+    }
+
+    public void EnableCollision()
+    {
+        solidCol.enabled = true;
+        triggerCol.enabled = true;
+
+    }
+
+
 
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.EnhancedTouch;
 
 //Important organizational level data for a single player
 public class PlayerData : MonoBehaviour
@@ -26,6 +27,7 @@ public class PlayerData : MonoBehaviour
     {
         pi = GetComponent<PlayerInput>();
 
+
     }
 
     // Update is called once per frame
@@ -37,8 +39,9 @@ public class PlayerData : MonoBehaviour
 
 
     //sets all player assets to current color
-    public void SetColor()
+    public void SetColor(int idx)
     {
+        
         BodySprite.color = PlayerManager.Instance.PlayerColors.Colors[colorIdx];
 
     }

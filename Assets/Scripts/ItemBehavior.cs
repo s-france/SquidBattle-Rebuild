@@ -11,6 +11,8 @@ public class ItemBehavior : MonoBehaviour
     float followSpeed = 3;
     float accelRate = 3.5f;
 
+    ColorSet Colors;
+
 
     // Start is called before the first frame update
     void Start()

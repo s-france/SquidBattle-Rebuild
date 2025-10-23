@@ -470,6 +470,9 @@ public class PlayerController : MonoBehaviour
             //acceleration based on distance
             accelRate = stats.summonAccel * ((Vector2)transform.position - summonPoint).magnitude;
 
+            //min acceleration to maintain responsiveness
+            accelRate = Mathf.Clamp(accelRate, 10f, 999);
+
             //move toward summon point
             phys.rb.MovePosition(Vector2.MoveTowards(transform.position, summonPoint, stats.summonSpeed * accelRate * Time.fixedDeltaTime));
 
@@ -535,7 +538,7 @@ public class PlayerController : MonoBehaviour
                 //skip still frames if OOB recovery rewind
                 if (charge == -1)
                 {
-                    while (RewindState.position == (Vector2)transform.position)
+                    while (RewindState.position == (Vector2)transform.position && states.Count > 0)
                     {
                         //clear still frames
                         RewindState = states.Pop();
@@ -614,39 +617,7 @@ public class PlayerController : MonoBehaviour
     //called when exiting a piece of ground terrain
     public void ExitTerrain(GroundTerrain terrain)
     {
-        /*
-
-        //if exiting a checkpoint zone
-        if (terrain.stats.isCheckPoint && !phys.currentTerrain.stats.isCheckPoint)
-        {
-            //update checkpoint to current pos
-            lastCheckPoint.xPos = transform.position.x;
-            lastCheckPoint.yPos = transform.position.y;
-
-            //FINISH THIS: replace current pos with Rewind ~ .7sec
-
-            float timer = 0;
-            //create temp stack to find previous state
-            Stack<PlayerState> previous = new Stack<PlayerState>(prevStates);
-            while (timer < .7f)
-            {
-                //FINISH THIS HERE!!!!
-                //count frames in checkpoint terrain
-                if (previous.Pop().Terrain.stats.isCheckPoint)
-                {
-                    timer += Time.fixedDeltaTime;
-                }
-                else //reset if not in checkpoint > .7fsec
-                {
-                    timer = 0;
-                }
-            }
-
-            PlayerState s = previous.Pop();
-
-        }
-
-        */
+        
     }
 
 
@@ -656,5 +627,6 @@ public class PlayerController : MonoBehaviour
         lastCheckPoint.Set(this);
         checkPointTimer = 0;
     }
+
 
 }

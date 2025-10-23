@@ -15,6 +15,8 @@ public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager Instance { get; private set; }
 
+    public static UnityEvent<PlayerData, int> colorChangedEvent;
+
     PlayerInputManager pim;
     [SerializeField] GameObject PlayerPrefab; //player obj prefab
 
@@ -42,12 +44,16 @@ public class PlayerManager : MonoBehaviour
         if (Instance != null)
         {
             Debug.Log("ERROR: trying to make more than one PlayerManager!");
+            //Destroy(gameObject);
         }
         else
         {
             //init as static instance
             Instance = this;
             DontDestroyOnLoad(Instance);
+
+            colorChangedEvent = new UnityEvent<PlayerData, int>();
+            colorChangedEvent.AddListener(SetColor);
 
 
             CameraTG = FindFirstObjectByType<CinemachineTargetGroup>();
@@ -165,6 +171,8 @@ public class PlayerManager : MonoBehaviour
         if (device is Gamepad && device.added)
         {
 
+            ///Xbox duplicate controller fix (it doesn't work)
+
             // We execute this code on `playerInput.onControlsChanged`
             if (device is UnityEngine.InputSystem.Switch.SwitchProControllerHID)
             {
@@ -260,7 +268,9 @@ public class PlayerManager : MonoBehaviour
         SetTeam(player, Teams.Find(t => t.Players.Count == 0));
 
         //assign first available color
-        SetColor(player, FindNextAvailableColor(pi.playerIndex, 1));
+        player.colorIdx = -1; //init to -1 to fix zero idx issue
+        colorChangedEvent.Invoke(player, FindNextAvailableColor(pi.playerIndex, 1));
+        //SetColor(player, FindNextAvailableColor(pi.playerIndex, 1));
 
         //run LevelController player join behavior
         if (LevelController.Instance != null)
@@ -324,6 +334,8 @@ public class PlayerManager : MonoBehaviour
             return;
         }
 
+        Debug.Log("old color: " + player.colorIdx);
+
         //free up old color
         TakenColors.Remove(player.colorIdx);
 
@@ -331,12 +343,20 @@ public class PlayerManager : MonoBehaviour
         player.colorIdx = colorID;
         player.color = PlayerColors.Colors[colorID];
 
+        Debug.Log("new color: " + player.colorIdx);
+
         //lock down new color
         TakenColors.Add(colorID);
 
+        Debug.Log("taken colors: ");
+        foreach (int c in TakenColors)
+        {
+            Debug.Log(c);
+        }
+
 
         //set player visuals
-        player.SetColor();
+        player.SetColor(colorID);
     }
 
     //assigns a player to a team
@@ -371,13 +391,27 @@ public class PlayerManager : MonoBehaviour
 
 
 
-    
+
+    //summons all players to summonPoint
     public void SummonPlayers(Vector2 summonPoint)
     {
         foreach (PlayerInput p in PlayerList)
         {
             StartCoroutine(p.GetComponent<PlayerController>().SummonPlayer(summonPoint));
 
+        }
+
+    }
+
+    //summons all players excluding one
+    public void SummonPlayers(Vector2 summonPoint, PlayerController exclude)
+    {
+        foreach (PlayerInput p in PlayerList)
+        {
+            if (p.GetComponent<PlayerController>() != exclude)
+            {
+                StartCoroutine(p.GetComponent<PlayerController>().SummonPlayer(summonPoint));
+            }
         }
 
     }
