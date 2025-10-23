@@ -9,9 +9,13 @@ public class ColorPad : MonoBehaviour
 
     bool isActive = true;
 
+    Color disabledColor;
+
     // Start is called before the first frame update
     void Start()
     {
+        disabledColor = new Color(.5f, .5f, .5f, .5f);
+
         sr = GetComponent<SpriteRenderer>();
         Activate();
 
@@ -46,7 +50,7 @@ public class ColorPad : MonoBehaviour
     void Deactivate()
     {
         isActive = false;
-        sr.color = Color.gray;
+        sr.color = disabledColor;
     }
 
     void OnColorChangeEvent(PlayerData pd, int color)
