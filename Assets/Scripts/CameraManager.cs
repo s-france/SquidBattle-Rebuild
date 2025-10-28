@@ -26,6 +26,12 @@ public class CameraManager : MonoBehaviour
         Cameras = GetComponentsInChildren<CinemachineVirtualCamera>().ToList<CinemachineVirtualCamera>();
         CamZones = GetComponentsInChildren<CameraZone>().ToList<CameraZone>();
 
+        //ensure cameras' z pos = -1
+        foreach (CinemachineVirtualCamera cam in Cameras)
+        {
+            cam.transform.position.Set(cam.transform.position.x, cam.transform.position.y, -1);
+        }
+
         SetActiveCam(ActiveCam);
     }
 

@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
+    public static Match GameMatch;
 
 
     void Awake()
@@ -19,7 +21,12 @@ public class GameManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(Instance);
 
-            
+            if (GameMatch == null)
+            {
+                GameMatch = new Match();
+            }
+
+
         }
 
     }
@@ -27,7 +34,7 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        
     }
 }
 
@@ -40,6 +47,53 @@ public class Match
     public int round = 0; //current round number
     public int pointsToWin; //points to be considered the winner
     public List<int> ItemsEnabled; //list of enabled items to spawn
+
+
+    public Match()
+    {
+        this.gameMode = 0;
+        this.scoreMode = 0;
+        this.pointsToWin = 10;
+        this.ItemsEnabled = new List<int>(); //FINISH THIS: DEFAULT CONSTRUCTOR SHOULD INCLUDE ALL ITEMS!!!
+
+        this.round = 0;
+
+        this.PlayerList = new List<PlayerController>();
+        this.Scores = new Dictionary<PlayerController, int>();
+
+        //init player list and scores to 0
+        foreach (PlayerInput pi in PlayerManager.Instance.PlayerList)
+        {
+            this.PlayerList.Add(pi.GetComponent<PlayerController>());
+            this.Scores.Add(pi.GetComponent<PlayerController>(), 0);
+        }
+
+        
+    }
+
+    public Match(int gamemode, int pointstowin, List<int> itemsenabled, int scoremode = 0)
+    {
+        this.gameMode = gamemode;
+        this.scoreMode = scoremode;
+        this.pointsToWin = pointstowin;
+        this.ItemsEnabled = itemsenabled;
+
+        this.round = 0;
+
+        this.PlayerList = new List<PlayerController>();
+        this.Scores = new Dictionary<PlayerController, int>();
+
+        //init player list and scores to 0
+        foreach (PlayerInput pi in PlayerManager.Instance.PlayerList)
+        {
+            this.PlayerList.Add(pi.GetComponent<PlayerController>());
+            this.Scores.Add(pi.GetComponent<PlayerController>(), 0);
+        }
+
+
+
+
+    }
 
 
 }
