@@ -96,5 +96,36 @@ public class Match
     }
 
 
+    public void SetGameMode(int gmode, int smode = 0)
+    {
+        gameMode = gmode;
+        scoreMode = smode;
+    }
+
+    public void SetScoreMode(int smode)
+    {
+        scoreMode = smode;
+    }
+
+
+    public void SetPointsToWin(int points)
+    {
+        pointsToWin = points;
+    }
+
+    public void EnableItem(int item)
+    {
+        if (!ItemsEnabled.Contains(item))
+        {
+            ItemsEnabled.Add(item);
+        }
+    }
+
+    public void DisableItem(int item)
+    {
+        ItemsEnabled.Remove(item);
+    }
+
+
 }
 
