@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class GameManager : MonoBehaviour
 {
@@ -34,8 +35,45 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
+
+    public void SetGameMode(int gmode, int smode = 0)
+    {
+        GameMatch.SetGameMode(gmode, smode);
+    }
+
+    public void SetScoreMode(int smode)
+    {
+        GameMatch.SetScoreMode(smode);
+    }
+
+
+    public void SetPointsToWin(int points)
+    {
+        GameMatch.SetPointsToWin(points);
+    }
+
+    public void EnableItem(int item)
+    {
+        GameMatch.EnableItem(item);
+    }
+
+    public void DisableItem(int item)
+    {
+        GameMatch.DisableItem(item);
+    }
+
+    public void ToggleItem(int item)
+    {
+        GameMatch.ToggleItem(item);
+    }
+
+    public void ScorePoints(PlayerController pc, int points)
+    {
+        GameMatch.ScorePoints(pc, points);
+    }
+
 }
 
 public class Match
@@ -54,7 +92,11 @@ public class Match
         this.gameMode = 0;
         this.scoreMode = 0;
         this.pointsToWin = 10;
-        this.ItemsEnabled = new List<int>(); //FINISH THIS: DEFAULT CONSTRUCTOR SHOULD INCLUDE ALL ITEMS!!!
+        this.ItemsEnabled = new List<int>();
+
+        //FINISH THIS: DEFAULT CONSTRUCTOR SHOULD INCLUDE ALL ITEMS!!!
+        ItemsEnabled.Add(0);
+        ItemsEnabled.Add(1);
 
         this.round = 0;
 
@@ -125,6 +167,24 @@ public class Match
     {
         ItemsEnabled.Remove(item);
     }
+
+    public void ToggleItem(int item)
+    {
+        if (ItemsEnabled.Contains(item))
+        {
+            DisableItem(item);
+        }
+        else
+        {
+            EnableItem(item);
+        }
+    }
+
+    public void ScorePoints(PlayerController pc, int points)
+    {
+        Scores[pc] += points;
+    }
+
 
 
 }

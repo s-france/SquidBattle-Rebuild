@@ -22,7 +22,7 @@ public class DashPad : MonoBehaviour
     {
         if (col.TryGetComponent<PhysicsObj>(out PhysicsObj otherObj))
         {
-            gameObject.SendMessageUpwards("DashPadEntered", this, SendMessageOptions.DontRequireReceiver);
+            //gameObject.SendMessageUpwards("DashPadEntered", this, SendMessageOptions.DontRequireReceiver);
 
             //send player data if a player is entering dashpad
             if (col.TryGetComponent<PlayerController>(out PlayerController pc))
@@ -36,6 +36,10 @@ public class DashPad : MonoBehaviour
                     g.StartCoroutine(g.SummonPlayersThroughGate(this, pc));
                 }
 
+            }
+            else
+            {
+                gameObject.SendMessageUpwards("DashPadEntered", this, SendMessageOptions.DontRequireReceiver);
             }
 
 

@@ -31,7 +31,7 @@ public class Gate : MonoBehaviour
     //unity message when player enters one of the gate's dashpads
     public void DashPadEntered(DashPad dp)
     {
-        if (allPlayersRoom) { return; }
+        //if (allPlayersRoom) { return; }
 
         if (dp == dashPad1)
         {
