@@ -783,7 +783,9 @@ MonoBehaviour:
   specialCharging: 0
   specialChargeTime: 0
   isRewind: 0
+  isRecall: 0
   stamina: 0
+  checkPointTimer: 0
   ItemInventory: []
   itemInventorySize: 5
 --- !u!114 &854338050657813883
@@ -812,7 +814,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef44763e408c3c7499f7ff0fdacd68a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pm: {fileID: 0}
   pi: {fileID: 8736686337939707414}
   BodySprite: {fileID: 91940134732367498}
   inGameIdx: -1
@@ -934,9 +935,6 @@ MonoBehaviour:
   solidCol: {fileID: 0}
   triggerCol: {fileID: 0}
   stats: {fileID: 11400000, guid: df08076b522ae43e59992268c39d63df, type: 2}
-  SolidColission:
-    m_PersistentCalls:
-      m_Calls: []
   isMoving: 0
   isKnockback: 0
   isGliding: 0
@@ -949,7 +947,9 @@ MonoBehaviour:
   currentTerrain: {fileID: 0}
   movepriority: 0
   moveSpeed: 0
+  moveTime: 0
   movePower: 0
+  moveTimer: 0
   glideSpeed: 0
   glideRate: 0
   hitStopTime: 0
@@ -1137,7 +1137,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71bb4aa265903450a9838387dee55b4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wheel: {fileID: 0}
 --- !u!1 &7900673198806169470
 GameObject:
   m_ObjectHideFlags: 0

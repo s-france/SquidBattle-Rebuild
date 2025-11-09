@@ -23,6 +23,7 @@ public class ShotBehavior : ItemBehavior
         ShotObj.Start();
 
         //give user initial intangibiilty frames from the Shot
+        Debug.Log("setting shot intangible!!");
         ShotObj.SetPeerPriority(ShotObj.IntangiblePeerPrioTable, pc.phys, .5f);
         pc.phys.SetPeerPriority(pc.phys.IntangiblePeerPrioTable, ShotObj, .5f);
 

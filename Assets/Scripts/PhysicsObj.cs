@@ -121,6 +121,8 @@ public class PhysicsObj : MonoBehaviour
     }
 
 
+
+
     //runs in FixedUpdate()
     //processes movement
     public virtual void MovementTick()
@@ -154,7 +156,7 @@ public class PhysicsObj : MonoBehaviour
 
                 rb.velocity = stats.MoveCurve.Evaluate(1 + (glideTimer / glideTime)) * glideSpeed * rb.velocity.normalized;
 
-                glideTimer += (Time.fixedDeltaTime * glideRate);
+                glideTimer += Time.fixedDeltaTime * glideRate;
 
 
             }
@@ -239,7 +241,7 @@ public class PhysicsObj : MonoBehaviour
     }
 
     //applys new move - sets movement variables
-    public void ApplyMove(bool isKB, float moveForce, Vector2 direction) //player-inputted moveForce is always between 0-1  //KB force can exceed 1
+    public virtual void ApplyMove(bool isKB, float moveForce, Vector2 direction) //player-inputted moveForce is always between 0-1  //KB force can exceed 1
     {
         isKnockback = isKB;
 
@@ -389,10 +391,15 @@ public class PhysicsObj : MonoBehaviour
             if (col.isTrigger && col.TryGetComponent<PhysicsObj>(out PhysicsObj otherObj))
             {
                 //exit if peer intangible
+                //SOMETHING'S WRONG HERE!!!!
                 if (IntangiblePeerPrioTable.ContainsKey(otherObj) && IntangiblePeerPrioTable[otherObj] > 0)
                 {
+                    Debug.Log("intangible collision! Exiting");
+
                     return;
                 }
+                Debug.Log("non-intangible collision!");
+                Debug.Log("key exists: " + IntangiblePeerPrioTable.ContainsKey(otherObj));
 
 
 
@@ -404,10 +411,10 @@ public class PhysicsObj : MonoBehaviour
 
                 Vector2 prev = (prevPos.Count() > 1) ? prevPos[1] : transform.position;
                 Vector2 otherPrev = (otherObj.prevPos.Count() > 1) ? otherObj.prevPos[1] : otherObj.transform.position;
-                
-                
+
+
                 ///collision correction safety check
-                if ((prev - otherPrev).magnitude > triggerCol.radius + otherObj.triggerCol.radius)
+                if ((prev - otherPrev).magnitude > triggerCol.radius + otherObj.triggerCol.radius) //make sure this is always true!!!
                 {
                     //correct collision position
                     var (pos, otherPos) = EstimateCircleTriggerCollision(triggerCol.radius * transform.localScale.x, otherObj.triggerCol.radius * otherObj.transform.localScale.x, transform.position, prev, otherObj.transform.position, otherPrev);
@@ -415,6 +422,8 @@ public class PhysicsObj : MonoBehaviour
                     transform.position = pos;
                     otherObj.transform.position = otherPos; //is this needed?
                 }
+                
+
 
                 //apply knockback
                 gameObject.SendMessage("ApplyKnockback", otherObj);
@@ -604,7 +613,7 @@ public class PhysicsObj : MonoBehaviour
         {
             if (otherMPrio <= 1)
             {
-
+                
             }
             else
             {
@@ -646,6 +655,7 @@ public class PhysicsObj : MonoBehaviour
         {
             //overpower "barrel through"
             //impedance based on otherStrength
+
 
             //give this player intangible priority from otherPlayer
             //8 ticks of intangibility
@@ -714,6 +724,8 @@ public class PhysicsObj : MonoBehaviour
                     //EDIT THIS: int constant = invol frame data
                     //IntangiblePeerPrioTable[otherPC] = 8 * Time.fixedDeltaTime;
                     SetPeerPriority(IntangiblePeerPrioTable, otherObj, 8 * Time.fixedDeltaTime);
+                    
+                    //USE OVERPOWER PRIORITY????
 
 
                     //use other player's stats for KB
@@ -918,7 +930,6 @@ public class PhysicsObj : MonoBehaviour
                 break;
         }
 
-        //bust
 
 
     }
@@ -955,13 +966,17 @@ public class PhysicsObj : MonoBehaviour
 
     public void SetPeerPriority(Dictionary<PhysicsObj, float> prioTable, PhysicsObj otherObj, float time)
     {
+        Debug.Log("setting peer prioriorty: " + time);
+
         if (prioTable.ContainsKey(otherObj))
         {
             prioTable[otherObj] = time;
+            Debug.Log("key exists.");
         }
         else
         {
             prioTable.Add(otherObj, time);
+            Debug.Log("key does NOT exist!");
         }
     }
 
@@ -989,6 +1004,7 @@ public class PhysicsObj : MonoBehaviour
                     IntangiblePeerPrioTable[IntangiblePeerPrioTable.Keys.ElementAt(i)] -= Time.fixedDeltaTime;
                 }
 
+                //clamp at 0
                 if (IntangiblePeerPrioTable[IntangiblePeerPrioTable.Keys.ElementAt(i)] < 0)
                 {
                     IntangiblePeerPrioTable[IntangiblePeerPrioTable.Keys.ElementAt(i)] = 0;
