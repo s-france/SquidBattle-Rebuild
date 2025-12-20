@@ -28,8 +28,8 @@ public class PhysicsObj : MonoBehaviour
 
 
     //peer priority tables //i.e. objs to treat as special cases in collisions
-    [HideInInspector] public Dictionary<PhysicsObj, float> OverpowerPeerPrioTable; //objs to overpower in KB interactions
-    [HideInInspector] public Dictionary<PhysicsObj, float> IntangiblePeerPrioTable; //objs to ignore in collision
+    [HideInInspector] public Dictionary<int, float> OverpowerPeerPrioTable; //objs to overpower in KB interactions
+    [HideInInspector] public Dictionary<int, float> IntangiblePeerPrioTable; //objs to ignore in collision
     //
 
     //state tracking vars
@@ -94,8 +94,8 @@ public class PhysicsObj : MonoBehaviour
         Collisions = new List<Collider2D>();
 
         //init PeerPriority tables
-        OverpowerPeerPrioTable = new Dictionary<PhysicsObj, float>();
-        IntangiblePeerPrioTable = new Dictionary<PhysicsObj, float>();
+        OverpowerPeerPrioTable = new Dictionary<int, float>();
+        IntangiblePeerPrioTable = new Dictionary<int, float>();
 
         //init prevPos list
         prevPos = new List<Vector2>(3);
@@ -392,14 +392,14 @@ public class PhysicsObj : MonoBehaviour
             {
                 //exit if peer intangible
                 //SOMETHING'S WRONG HERE!!!!
-                if (IntangiblePeerPrioTable.ContainsKey(otherObj) && IntangiblePeerPrioTable[otherObj] > 0)
+                if (IntangiblePeerPrioTable.ContainsKey(otherObj.GetInstanceID()) && IntangiblePeerPrioTable[otherObj.GetInstanceID()] > 0)
                 {
                     Debug.Log("intangible collision! Exiting");
 
                     return;
                 }
                 Debug.Log("non-intangible collision!");
-                Debug.Log("key exists: " + IntangiblePeerPrioTable.ContainsKey(otherObj));
+                Debug.Log("key exists: " + IntangiblePeerPrioTable.ContainsKey(otherObj.GetInstanceID()));
 
 
 
@@ -651,7 +651,7 @@ public class PhysicsObj : MonoBehaviour
 
         //first case
         //if this player overpowers otherPlayer
-        if (OverpowerPeerPrioTable.ContainsKey(otherObj) && OverpowerPeerPrioTable[otherObj] > 0)
+        if (OverpowerPeerPrioTable.ContainsKey(otherObj.GetInstanceID()) && OverpowerPeerPrioTable[otherObj.GetInstanceID()] > 0)
         {
             //overpower "barrel through"
             //impedance based on otherStrength
@@ -964,18 +964,18 @@ public class PhysicsObj : MonoBehaviour
 
 
 
-    public void SetPeerPriority(Dictionary<PhysicsObj, float> prioTable, PhysicsObj otherObj, float time)
+    public void SetPeerPriority(Dictionary<int, float> prioTable, PhysicsObj otherObj, float time)
     {
         Debug.Log("setting peer prioriorty: " + time);
 
-        if (prioTable.ContainsKey(otherObj))
+        if (prioTable.ContainsKey(otherObj.GetInstanceID()))
         {
-            prioTable[otherObj] = time;
+            prioTable[otherObj.GetInstanceID()] = time;
             Debug.Log("key exists.");
         }
         else
         {
-            prioTable.Add(otherObj, time);
+            prioTable.Add(otherObj.GetInstanceID(), time);
             Debug.Log("key does NOT exist!");
         }
     }
@@ -992,6 +992,7 @@ public class PhysicsObj : MonoBehaviour
                 //clear overpower prio table
                 for (int i = 0; i < OverpowerPeerPrioTable.Count; i++)
                 {
+                    //OverpowerPeerPrioTable.Clear(); //TRY THIS???
                     OverpowerPeerPrioTable[OverpowerPeerPrioTable.Keys.ElementAt(i)] = 0;
                 }
             }
