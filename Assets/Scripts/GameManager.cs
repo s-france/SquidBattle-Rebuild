@@ -76,6 +76,10 @@ public class GameManager : MonoBehaviour
 
 }
 
+////////////////////////////////////////////////////////////////////
+/// //////////////////////////////////////////////////////////////////
+
+//MATCH CLASS
 public class Match
 {
     public int gameMode; //gamemode being played
@@ -95,8 +99,13 @@ public class Match
         this.ItemsEnabled = new List<int>();
 
         //FINISH THIS: DEFAULT CONSTRUCTOR SHOULD INCLUDE ALL ITEMS!!!
-        ItemsEnabled.Add(0);
-        ItemsEnabled.Add(1);
+        ItemsEnabled.Add(0); //shot
+        ItemsEnabled.Add(1); //ink
+        ItemsEnabled.Add(2); //warp
+        ItemsEnabled.Add(3); //wall
+        ItemsEnabled.Add(4); //rewind
+        ItemsEnabled.Add(5); //grow
+        ItemsEnabled.Add(6); //double
 
         this.round = 0;
 
@@ -110,7 +119,7 @@ public class Match
             this.Scores.Add(pi.GetComponent<PlayerController>(), 0);
         }
 
-        
+
     }
 
     public Match(int gamemode, int pointstowin, List<int> itemsenabled, int scoremode = 0)

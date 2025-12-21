@@ -45,6 +45,8 @@ public class ProjectileObj : PhysicsObj
         {
 
         }
+        
+        
 
         base.ApplyMove(isKB, moveForce, direction);
 

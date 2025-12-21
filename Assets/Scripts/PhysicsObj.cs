@@ -589,7 +589,7 @@ public class PhysicsObj : MonoBehaviour
         Vector2 direction;
         //direction when one player overpowers other               
         direction = ((otherDirectness * otherImpactDirection) + (otherPosDiff * (1 / otherDirectness))).normalized;
-
+        
 
 
         //armor priority recalculations
