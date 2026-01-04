@@ -329,7 +329,7 @@ public class PhysicsObj : MonoBehaviour
 
     //type 0: additive
     //type 1: overwrite
-    void ApplyHitStop(int type, float time)
+    public virtual void ApplyHitStop(int type, float time)
     {
 
         if (type == 0)
@@ -392,6 +392,7 @@ public class PhysicsObj : MonoBehaviour
             {
                 //exit if peer intangible
                 //SOMETHING'S WRONG HERE!!!!
+                //NEVERMIND ITS FINE!!!!!!!
                 if (IntangiblePeerPrioTable.ContainsKey(otherObj.GetInstanceID()) && IntangiblePeerPrioTable[otherObj.GetInstanceID()] > 0)
                 {
                     Debug.Log("intangible collision! Exiting");
@@ -509,7 +510,7 @@ public class PhysicsObj : MonoBehaviour
 
     public virtual IEnumerator Knockback(PhysicsObj otherObj)
     {
-        //THIS IS SUS:
+        //THIS IS SUS:  /you can probably just delete/remove this now...
         //baseline peer intangibility to prevent double collisions
         SetPeerPriority(IntangiblePeerPrioTable, otherObj, .2f);
 
@@ -589,7 +590,7 @@ public class PhysicsObj : MonoBehaviour
         Vector2 direction;
         //direction when one player overpowers other               
         direction = ((otherDirectness * otherImpactDirection) + (otherPosDiff * (1 / otherDirectness))).normalized;
-        
+
 
 
         //armor priority recalculations
@@ -992,7 +993,6 @@ public class PhysicsObj : MonoBehaviour
                 //clear overpower prio table
                 for (int i = 0; i < OverpowerPeerPrioTable.Count; i++)
                 {
-                    //OverpowerPeerPrioTable.Clear(); //TRY THIS???
                     OverpowerPeerPrioTable[OverpowerPeerPrioTable.Keys.ElementAt(i)] = 0;
                 }
             }
@@ -1000,7 +1000,7 @@ public class PhysicsObj : MonoBehaviour
             //tick intangibility timers
             for (int i = 0; i < IntangiblePeerPrioTable.Count; i++)
             {
-                if (IntangiblePeerPrioTable[IntangiblePeerPrioTable.Keys.ElementAt(i)] > 0)
+                if (IntangiblePeerPrioTable[IntangiblePeerPrioTable.Keys.ElementAt(i)] > 0 /*&& */)
                 {
                     IntangiblePeerPrioTable[IntangiblePeerPrioTable.Keys.ElementAt(i)] -= Time.fixedDeltaTime;
                 }
