@@ -24,12 +24,6 @@ public class ProjectileObj : PhysicsObj
 
     public override IEnumerator Knockback(PhysicsObj otherObj)
     {
-        //set same movePriority for KB interactions
-        movepriority = otherObj.movepriority;
-        //^^doesn't work
-        //TRY THIS:
-        //movepriority = -1;
-
         Debug.Log("otherobj: " + otherObj.gameObject.name);
         //return base.Knockback(otherObj);
 
@@ -124,6 +118,7 @@ public class ProjectileObj : PhysicsObj
 
 
 
+        /*
         //armor priority recalculations
         //other player is armored
         if (otherArmor > 0 && otherArmor > armor)
@@ -153,6 +148,7 @@ public class ProjectileObj : PhysicsObj
                 mPrio = 4;
             }
         }
+        */
 
 
 
@@ -164,8 +160,15 @@ public class ProjectileObj : PhysicsObj
         yield return new WaitForFixedUpdate();
         /////
 
+        //give this obj intangible priority from otherObj
+        //EDIT THIS: int constant = invol frame data
+        SetPeerPriority(IntangiblePeerPrioTable, otherObj, 8 * Time.fixedDeltaTime);
 
-        
+        //currently in hitstop, use -storedvelocity to cancel out current direction
+        Vector2 directionMod = (Vector2.Reflect(storedVelocity, otherPosDiff) * 200);
+
+        ModifyMove(false, directionMod, 1, 1f, 1);
+
 
 
 
@@ -182,11 +185,46 @@ public class ProjectileObj : PhysicsObj
         {
 
         }
-        
-        
+
+
 
         base.ApplyMove(isKB, moveForce, direction);
 
+    }
+
+    //only direction and power are moddable for projectiles
+    public override void ModifyMove(bool isKB, Vector2 directionMod, float durationMod, float speedMod, float powerMod)
+    {
+        isKnockback = isKB;
+
+        //mod direction
+        Vector2 direction;
+
+        if (isHitStop)
+        {
+            direction = (directionMod + storedVelocity.normalized).normalized;
+            storedVelocity = storedVelocity.magnitude * direction;
+        }
+        else
+        {
+            direction = (directionMod + rb.velocity.normalized).normalized;
+            rb.velocity = rb.velocity.magnitude * direction;
+        }
+        //
+
+        //mod timers
+        //moveTime *= durationMod;
+        //moveTimer *= durationMod;
+
+        //doing too much
+        //glideTime *= durationMod;
+        //glideTimer *= durationMod;
+
+        //moveSpeed *= speedMod;
+
+        //mod power
+        movePower *= powerMod;
+        //initialMovePower *= powerMod;
     }
     
 

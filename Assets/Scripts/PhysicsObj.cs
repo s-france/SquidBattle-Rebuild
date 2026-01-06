@@ -291,7 +291,7 @@ public class PhysicsObj : MonoBehaviour
     //directionMod => modifier applied to current rb direction
     //durationMod => modifier applied to current moveTime + moveTimer vars
     //powerMod => modifier applied to current movePower
-    public void ModifyMove(bool isKB, Vector2 directionMod, float durationMod, float speedMod, float powerMod)
+    public virtual void ModifyMove(bool isKB, Vector2 directionMod, float durationMod, float speedMod, float powerMod)
     {
 
         isKnockback = isKB;

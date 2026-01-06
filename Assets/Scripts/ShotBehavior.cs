@@ -28,7 +28,7 @@ public class ShotBehavior : ItemBehavior
         pc.phys.SetPeerPriority(pc.phys.IntangiblePeerPrioTable, ShotObj, .5f);
 
         //launch Shot projectile
-        ShotObj.ApplyMove(false, charge, pc.aim_move.normalized);
+        ShotObj.ApplyMove(false, charge, -pc.aim_move.normalized); //I feel like this should be positive but this works??
 
         //apply recoil to player
         pc.phys.ApplyMove(false, .5f * charge, -pc.aim_move);
