@@ -43,23 +43,6 @@ public class Switch : MonoBehaviour
         }
     }
 
-    
-    /*
-    public void OnTriggerEnter2D(Collider2D col)
-    {
-        if (col.TryGetComponent<PhysicsObj>(out PhysicsObj obj))
-        {
-            Debug.Log("switch trigger enter");
-
-            //flip on/off
-            isOn = !isOn;
-
-            onSwitchHitEvent.Invoke(obj, isOn);
-
-            ToggleSwitch();
-        }
-    }
-    */
 
 
     //updates switch display

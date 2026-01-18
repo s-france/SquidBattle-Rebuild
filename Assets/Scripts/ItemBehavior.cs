@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class ItemBehavior : MonoBehaviour
 {
+    [SerializeField] public int type;
+
+
     [HideInInspector] public PlayerController pc;
     [HideInInspector] public Transform FollowPoint;
     [HideInInspector] public Collider2D pickupTrigger;

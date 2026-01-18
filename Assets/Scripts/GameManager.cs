@@ -7,7 +7,12 @@ using UnityEngine.SocialPlatforms.Impl;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
-    public static Match GameMatch;
+    public static Match GameMatch; //match tracking class
+
+
+
+    //universal reusable game variables
+    public static WaitForFixedUpdate waitForFixedUpdate;
 
 
     void Awake()
@@ -25,6 +30,11 @@ public class GameManager : MonoBehaviour
             if (GameMatch == null)
             {
                 GameMatch = new Match();
+            }
+
+            if (waitForFixedUpdate == null)
+            {
+                waitForFixedUpdate = new WaitForFixedUpdate();
             }
 
 

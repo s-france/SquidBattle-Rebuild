@@ -10,7 +10,7 @@ using UnityEngine.Events;
 using UnityEngine.UIElements;
 
 [RequireComponent(typeof(Rigidbody2D))]
-[RequireComponent(typeof(Collider2D), typeof(Collider2D))]
+//[RequireComponent(typeof(Collider2D), typeof(Collider2D))]
 public class PhysicsObj : MonoBehaviour
 {
     LevelController lc;
@@ -249,6 +249,8 @@ public class PhysicsObj : MonoBehaviour
         moveTime = stats.maxMoveTime * stats.moveTimeCurve.Evaluate(moveForce);
         movePower = initialMovePower = stats.maxMovePower * stats.movePowerCurve.Evaluate(moveForce);
         moveSpeed = glideSpeed = stats.maxMoveSpeed * stats.moveSpeedCurve.Evaluate(moveForce);
+
+        Debug.Log("moveTime: " + moveTime);
 
         //TRY THIS: only apply mods if !isKB
         //apply terrain mods
