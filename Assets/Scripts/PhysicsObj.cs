@@ -250,8 +250,6 @@ public class PhysicsObj : MonoBehaviour
         movePower = initialMovePower = stats.maxMovePower * stats.movePowerCurve.Evaluate(moveForce);
         moveSpeed = glideSpeed = stats.maxMoveSpeed * stats.moveSpeedCurve.Evaluate(moveForce);
 
-        Debug.Log("moveTime: " + moveTime);
-
         //TRY THIS: only apply mods if !isKB
         //apply terrain mods
         moveTime *= currentTerrain.stats.timeMod;
@@ -1065,6 +1063,12 @@ public class PhysicsObj : MonoBehaviour
             }
         }
 
+    }
+
+    public void CancelMove()
+    {
+        moveTime = moveTimer = glideTime = glideTimer = movePower = moveSpeed = 0;
+        isMoving = isKnockback = isGliding = false;
     }
 
     void TerrainTick()

@@ -25,9 +25,11 @@ public class PlayerController : MonoBehaviour
 
     public PhysicsObj phys;
     PlayerAnimation animate;
-    PlayerInput pi;
+    [HideInInspector] public PlayerInput pi;
     PlayerData data;
     public PlayerStats stats;
+
+    [HideInInspector] public PlayerContainer Container; //reference to container (if player is in a container)
 
     //input tracking
     bool chargePressed;
