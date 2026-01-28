@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 6485049950115631056}
   - component: {fileID: 862528618859885234}
   - component: {fileID: 2640559385827134631}
+  - component: {fileID: 5598738430436791039}
   m_Layer: 6
   m_Name: Shot
   m_TagString: Untagged
@@ -217,10 +218,26 @@ MonoBehaviour:
   currentTerrain: {fileID: 0}
   movepriority: 0
   moveSpeed: 0
+  moveTime: 0
   movePower: 0
+  moveTimer: 0
   glideSpeed: 0
   glideRate: 1
   hitStopTime: 0
   hitStopTimer: 0
   passiveArmor: 0
   moveArmor: 0
+--- !u!114 &5598738430436791039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 932854131873685891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41b9600d8344f4cc7a3d690ac90c6919, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lifeSpan: 5
+  timer: 0

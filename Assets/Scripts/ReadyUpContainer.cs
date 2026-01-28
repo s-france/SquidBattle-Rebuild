@@ -9,6 +9,7 @@ public class ReadyUpContainer : PlayerContainer
     void Start()
     {
          capacity = 6;
+         
     }
 
 
@@ -25,12 +26,14 @@ public class ReadyUpContainer : PlayerContainer
         }
 
         //run ReadyUp function
-
+        
 
     }
 
     public void OnPlayerExit(PlayerController pc)
     {
+        Contents.Remove(pc);
+
         //eject player in a direction
 
     }
