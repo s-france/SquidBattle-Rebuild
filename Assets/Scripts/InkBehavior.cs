@@ -34,7 +34,7 @@ public class InkBehavior : ItemBehavior
     IEnumerator EmitInk(float charge)
     {
         //emit at least one initial ink cloud
-        SpawnInkObj(charge);
+        //SpawnInkObj(charge);
 
 
         while (pc.phys.isMoving)
@@ -68,7 +68,9 @@ public class InkBehavior : ItemBehavior
 
         //ADD THIS:  calc/randomize moveforce, size, and direction
         float moveForce = charge; //launch force of ink cloud
-        Vector2 direction = -pc.phys.rb.velocity.normalized; //ink launch direction
+        float directionMod = Random.Range(-directionRandomness, directionRandomness);
+
+        Vector2 direction = -pc.phys.rb.velocity.normalized + Vector2.Perpendicular(-pc.phys.rb.velocity.normalized).normalized * directionMod; //ink launch direction
 
         float sizeVal = Random.Range((maxSize * sizeCurve.Evaluate(charge / pc.stats.maxChargeTime)) - sizeRandomness, (maxSize * sizeCurve.Evaluate(charge / pc.stats.maxChargeTime)) + sizeRandomness);
         Vector3 size = new Vector3(sizeVal, sizeVal, 1); //size of ink cloud
