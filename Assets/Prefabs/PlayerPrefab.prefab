@@ -756,6 +756,14 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: f75bb66d-ec12-4e15-ba2b-3bfa9f210846
     m_ActionName: 'CharacterSelect/ShoulderJoin/RT+RB[/SwitchProControllerHID/leftTrigger,/SwitchProControllerHID1/leftTrigger,/SwitchProControllerHID/rightTrigger,/SwitchProControllerHID1/rightTrigger]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: b1c69cb7-afa3-4f93-8d81-caf11a1a053e
+    m_ActionName: ConfirmSelection/Confirm
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 89e569dc-c907-4b74-a56a-e3e67e8523ac
+    m_ActionName: ConfirmSelection/Exit
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Controller
   m_DefaultActionMap: GamePlay
@@ -774,7 +782,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   phys: {fileID: 0}
+  pi: {fileID: 0}
   stats: {fileID: 11400000, guid: df08076b522ae43e59992268c39d63df, type: 2}
+  Container: {fileID: 0}
   input_move: {x: 0, y: 0}
   aim_move: {x: 0, y: 0}
   staticTimer: 0
@@ -795,7 +805,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6264383407717547564}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9de1b5e48b3534f4bb4157f019dab015, type: 3}
   m_Name: 

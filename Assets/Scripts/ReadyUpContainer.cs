@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class ReadyUpContainer : PlayerContainer
-{
-    
+{   
     // Start is called before the first frame update
     void Start()
     {
@@ -37,4 +37,6 @@ public class ReadyUpContainer : PlayerContainer
         //eject player in a direction
 
     }
+
+    
 }

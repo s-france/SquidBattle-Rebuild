@@ -52,6 +52,12 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public PlayerState lastCheckPoint;
     [HideInInspector] public float checkPointTimer = 0; //time since last checkpoint update
 
+    //commonly used calculations
+    [HideInInspector] public float chargeRatio => chargeTime/stats.maxChargeTime;
+    [HideInInspector] public float specialChargeRatio => specialChargeTime/stats.maxChargeTime;
+
+
+
     //
 
     //item stuff
@@ -439,17 +445,6 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    public void ApplyKnockback(PhysicsObj otherObj)
-    {
-        //cancel charge
-
-
-        //check for parry -> override KB calcs
-
-        //assign killcredit
-
-
-    }
 
     //coroutine to summon/warp player to a position (used in hub world transitions)
     public IEnumerator SummonPlayer(Vector2 summonPoint)

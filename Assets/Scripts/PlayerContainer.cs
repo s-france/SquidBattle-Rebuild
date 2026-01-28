@@ -6,7 +6,9 @@ using UnityEngine.InputSystem;
 
 public class PlayerContainer : MonoBehaviour
 {
-    public int capacity;
+    public int capacity; //how many players can occupy container at once
+    public Vector2 EjectStat = Vector2.down; //vector dictates exit force + direction
+    //public float ejectRandomness; //randomization factor for eject direction
     [HideInInspector] public List<PlayerController> Contents;
     public UnityEvent<PlayerController> playerEnterEvent;
     public UnityEvent<PlayerController> playerExitEvent;
@@ -62,10 +64,11 @@ public class PlayerContainer : MonoBehaviour
 
             pc.Container = null;
 
+            //move this above contents.remove^^ if eject doesn't work...
             pc.phys.solidCol.enabled = true;
             pc.phys.triggerCol.enabled = true;
 
-            //set player inputs to container specifications
+            //set player input action map back to gameplay mode
             pc.pi.SwitchCurrentActionMap("GamePlay");
 
 
@@ -74,4 +77,14 @@ public class PlayerContainer : MonoBehaviour
 
         }
     }
+
+    //handles behavior for ejecting players from container
+    public virtual void Eject(PlayerController pc)
+    {
+        //eject downwards by default
+        pc.phys.ApplyMove(true, EjectStat.magnitude, EjectStat.normalized);
+        
+    }
+
+
 }

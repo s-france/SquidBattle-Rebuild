@@ -130,7 +130,7 @@ MonoBehaviour:
   rb: {fileID: 0}
   solidCol: {fileID: 0}
   triggerCol: {fileID: 0}
-  stats: {fileID: 11400000, guid: c118b9d2a6d4c4f62b875a7997ae1070, type: 2}
+  stats: {fileID: 11400000, guid: 2ca5f1054c1a34ea0b937cb4cc922eac, type: 2}
   isMoving: 0
   isKnockback: 0
   isGliding: 0
