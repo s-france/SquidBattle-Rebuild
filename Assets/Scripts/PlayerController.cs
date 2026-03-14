@@ -26,7 +26,7 @@ public class PlayerController : MonoBehaviour
     public PhysicsObj phys;
     PlayerAnimation animate;
     [HideInInspector] public PlayerInput pi;
-    PlayerData data;
+    [HideInInspector] public PlayerData data;
     public PlayerStats stats;
 
     [HideInInspector] public PlayerContainer Container; //reference to container (if player is in a container)
@@ -66,8 +66,6 @@ public class PlayerController : MonoBehaviour
     //
 
 
-    public static int test;
-
 
     // Start is called before the first frame update
     void Start()
@@ -100,6 +98,12 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
 
+    }
+
+    
+    void OCollisionEnter2D(Collision2D col)
+    {
+        
     }
 
     void FixedUpdate()

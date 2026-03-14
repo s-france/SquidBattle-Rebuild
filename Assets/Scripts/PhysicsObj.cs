@@ -21,6 +21,8 @@ public class PhysicsObj : MonoBehaviour
 
     public PhysicsStats stats; //base stats reference for this physics obj
 
+    public bool dealsDamage = true; //whether or not this obj should damage things with hp (terrain)
+
     //public UnityEvent<GameObject, GameObject> SolidColission;
 
 

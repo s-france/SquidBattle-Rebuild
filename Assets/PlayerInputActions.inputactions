@@ -76,6 +76,17 @@
                 },
                 {
                     "name": "",
+                    "id": "6e6b2d95-22f4-43ea-837e-f4828a99b781",
+                    "path": "<DualShockGamepad>/buttonSouth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Controller",
+                    "action": "A/Confirm",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "3a0d7a93-1f06-4f21-97cd-df8ed74f1692",
                     "path": "<SwitchProControllerHID>/buttonSouth",
                     "interactions": "",
@@ -89,6 +100,17 @@
                     "name": "",
                     "id": "0b8bd816-7648-426b-8574-7585b5cba4a0",
                     "path": "<XInputController>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Controller",
+                    "action": "B/Back",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "91506750-a810-40b9-8671-276abd91d82a",
+                    "path": "<DualShockGamepad>/buttonEast",
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
@@ -837,7 +859,7 @@
             ]
         },
         {
-            "name": "ConfirmSelection",
+            "name": "MenuContainer",
             "id": "da87fd5d-c09d-4333-b56f-67345c80fb36",
             "actions": [
                 {
@@ -850,7 +872,7 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Exit",
+                    "name": "Cancel",
                     "type": "Button",
                     "id": "89e569dc-c907-4b74-a56a-e3e67e8523ac",
                     "expectedControlType": "Button",
@@ -900,7 +922,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Exit",
+                    "action": "Cancel",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -911,7 +933,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Exit",
+                    "action": "Cancel",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -922,7 +944,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Exit",
+                    "action": "Cancel",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

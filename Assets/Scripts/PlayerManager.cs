@@ -68,7 +68,6 @@ public class PlayerManager : MonoBehaviour
             //make Team List
             Teams = new List<Team>();
             //make all 6 teams
-            //if you are reading this fuck you
             Teams.Add(new Team(0));
             Teams.Add(new Team(1));
             Teams.Add(new Team(2));
@@ -263,7 +262,6 @@ public class PlayerManager : MonoBehaviour
         CameraTG.AddMember(pi.transform, 1, 1);
 
 
-
         //assign to first empty team
         SetTeam(player, Teams.Find(t => t.Players.Count == 0));
 
@@ -386,6 +384,12 @@ public class PlayerManager : MonoBehaviour
         player.Team?.Players.Remove(player);
         player.teamIdx = -1;
         player.Team = null;
+    }
+
+
+    public void ReadyPlayer(PlayerController pc)
+    {
+        
     }
 
 

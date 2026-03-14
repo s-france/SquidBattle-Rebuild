@@ -37,7 +37,7 @@ public class PlayerContainer : MonoBehaviour
         }
     }
 
-    void EnterContainer(PlayerController pc)
+    public void EnterContainer(PlayerController pc)
     {
         Contents.Add(pc);
         pc.Container = this;
@@ -56,7 +56,7 @@ public class PlayerContainer : MonoBehaviour
         playerEnterEvent.Invoke(pc);
     }
 
-    void ExitContainer(PlayerController pc)
+    public void ExitContainer(PlayerController pc)
     {
         if(Contents.Contains(pc))
         {
@@ -85,6 +85,36 @@ public class PlayerContainer : MonoBehaviour
         pc.phys.ApplyMove(true, EjectStat.magnitude, EjectStat.normalized);
         
     }
+
+    public virtual void OnCancel(InputAction.CallbackContext ctx, PlayerController pc)
+    {
+        //default behavior - override in subclass
+        if (ctx.performed)
+        {
+            
+        }
+        else if (ctx.canceled)
+        {
+            ExitContainer(pc);
+        }
+    }
+
+    //implement in subclass
+    public virtual void OnConfirm(InputAction.CallbackContext ctx, PlayerController pc)
+    {
+        //default behavior - override in subclass
+        if (ctx.performed)
+        {
+            
+        }
+        else if (ctx.canceled)
+        {
+            ExitContainer(pc);
+        }
+        
+    }
+
+
 
 
 }
