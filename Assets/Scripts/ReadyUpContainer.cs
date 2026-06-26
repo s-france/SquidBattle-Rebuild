@@ -6,7 +6,7 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
 public class ReadyUpContainer : PlayerContainer
-{ 
+{
     public UnityEvent playersReadyEvent;
 
     // Start is called before the first frame update
