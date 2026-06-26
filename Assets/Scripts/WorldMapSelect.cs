@@ -8,13 +8,16 @@ using UnityEngine.WSA;
 public class WorldMapSelect : MonoBehaviour
 {
     public Transform[] Tokens;
+    public GameObject cam;
+    public GameObject map;
+    
     // Start is called before the first frame update
-    /*
+    
     void Start()
     {
-        
+        Deactivate();
     }
-    */
+
 
     // Update is called once per frame
     void Update()
@@ -22,31 +25,43 @@ public class WorldMapSelect : MonoBehaviour
         TestFunction();
     }
 
-    public void Activate(PlayerContainer container)
+    //public void Activate(PlayerContainer container)
+    public void Activate()
     {
         Debug.Log("activating world map!");
 
+        //activate camera
+
+        cam.SetActive(true);
+        map.SetActive(true);
+
         // switch players' actionmap to WorldMap controls
+        int index = 0;
         foreach (PlayerInput player in PlayerManager.Instance.PlayerList)
         {
             player.SwitchCurrentActionMap("WorldMap");
-        }
-        // Assign Players to Token
-        foreach (Transform Token in Tokens)
-        {
-            
+            Tokens[index].position = Vector3.zero;
+            player.GetComponent<WorldMapPlayerController>().Token = Tokens[index];
+            index++;
         }
 
-        //init display
+        for (int i = index; i == 5; i++)
+        {
+            Tokens[i].gameObject.SetActive(false);
+        }
+
+
         //set default token pos
         //draw all sprites
 
 
     }
 
-    public void Deactivate(PlayerContainer container)
+    //public void Deactivate(PlayerContainer container)
+    public void Deactivate()
     {
-
+        cam.SetActive(false);
+        map.SetActive(false);
     }
 
     void TestFunction() {
