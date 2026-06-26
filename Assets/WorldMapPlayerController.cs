@@ -38,7 +38,7 @@ public class WorldMapPlayerController : MonoBehaviour
             {
                 if (Token.GetComponent<Collider2D>().IsTouching(map.GetComponent<Collider2D>()))
                 {
-                    Debug.Log("True!")
+                    Debug.Log("True!");
                 }
             }
         }
