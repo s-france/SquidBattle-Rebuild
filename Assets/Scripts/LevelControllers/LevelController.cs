@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class LevelController : MonoBehaviour
 {
@@ -22,16 +23,9 @@ public class LevelController : MonoBehaviour
 
         OOBTerrain = GetComponent<GroundTerrain>();
 
-        //default behavior:
-        /* //not really needed rn -could be useful at some point to put default behaviors here
-        
-        //set all players input actionmaps to Gameplay
-        foreach (PlayerInput p in pm.PlayerList)
-        {
-            p.SwitchCurrentActionMap("Gameplay");
-        }
+        SceneManager.LoadScene("WorldMap", LoadSceneMode.Additive);
 
-        */
+
 
     }
 
