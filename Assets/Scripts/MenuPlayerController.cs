@@ -22,7 +22,7 @@ public class MenuPlayerController : MonoBehaviour
 
     public void OnConfirm(InputAction.CallbackContext ctx)
     {
-        pc.Container.OnConfirm(ctx, pc);
+        //pc.Container.OnConfirm(ctx, pc);
 
     }
 

@@ -46,9 +46,13 @@ public class WorldMapSelect : MonoBehaviour
             index++;
         }
 
-        for (int i = index; i == 5; i++)
+        //Debug.Log("i = " + index);
+
+        while (index < 6)
         {
-            Tokens[i].gameObject.SetActive(false);
+            //Debug.Log("disabling token " + index);
+            Tokens[index].gameObject.SetActive(false);
+            index++;
         }
 
 

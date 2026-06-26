@@ -50,6 +50,9 @@ public class PlayerContainer : MonoBehaviour
         pc.transform.position = transform.position;
         pc.phys.solidCol.enabled = false;
         pc.phys.triggerCol.enabled = false;
+        pc.phys.rb.velocity = Vector2.zero;
+
+        pc.enabled = false;
 
         pc.phys.enabled = false;
 
@@ -67,11 +70,16 @@ public class PlayerContainer : MonoBehaviour
         {
             Contents.Remove(pc);
 
+            pc.enabled = true;
+            pc.phys.enabled = true;
+
             pc.Container = null;
 
             //move this above contents.remove^^ if eject doesn't work...
             pc.phys.solidCol.enabled = true;
             pc.phys.triggerCol.enabled = true;
+
+            
 
             //set player input action map back to gameplay mode
             pc.pi.SwitchCurrentActionMap("GamePlay");
@@ -104,9 +112,14 @@ public class PlayerContainer : MonoBehaviour
         }
     }
 
+
+    
+    /*
     //implement in subclass
     public virtual void OnConfirm(InputAction.CallbackContext ctx, PlayerController pc)
     {
+        Debug.Log("container confirm!");
+
         //default behavior - override in subclass
         if (ctx.performed)
         {
@@ -118,6 +131,7 @@ public class PlayerContainer : MonoBehaviour
         }
         
     }
+    */
 
 
 
