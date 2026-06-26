@@ -66,10 +66,11 @@ public class LevelController : MonoBehaviour
 
     }
 
-    public void ActivateWorldMap()
+    public void ActivateWorldMap(PlayerContainer cont)
     {
         WorldMapSelect worldMap = GameObject.FindFirstObjectByType<WorldMapSelect>();
 
+        worldMap.Activate(cont);
         
 
 

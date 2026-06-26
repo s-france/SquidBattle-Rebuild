@@ -24,6 +24,8 @@ public class WorldMapSelect : MonoBehaviour
 
     public void Activate(PlayerContainer container)
     {
+        Debug.Log("activating world map!");
+
         // switch players' actionmap to WorldMap controls
         foreach (PlayerInput player in PlayerManager.Instance.PlayerList)
         {
@@ -48,6 +50,6 @@ public class WorldMapSelect : MonoBehaviour
     }
 
     void TestFunction() {
-        Debug.Log(Tokens[0].GetComponent<Transform>().position.x);
+        //Debug.Log(Tokens[0].GetComponent<Transform>().position.x);
     }
 }
