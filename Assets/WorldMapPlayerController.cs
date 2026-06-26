@@ -27,7 +27,7 @@ public class WorldMapPlayerController : MonoBehaviour
         if(Token != null)
         {
             
-            Token.position += (Vector3)(MoveVector)*0.5f;
+            Token.position += (Vector3)(MoveVector)*0.25f;
         }
     }
 
