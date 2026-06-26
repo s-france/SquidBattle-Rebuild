@@ -11,6 +11,8 @@ public class WorldMapSelect : MonoBehaviour
     public Transform[] Maps;
     public GameObject cam;
     public GameObject map;
+
+    [HideInInspector] public PlayerContainer originContainer; //player container that opened map screen
     
     // Start is called before the first frame update
     

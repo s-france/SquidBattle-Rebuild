@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using NUnit.Framework.Constraints;
 using Unity.PlasticSCM.Editor.WebApi;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -28,13 +29,17 @@ public class WorldMapPlayerController : MonoBehaviour
     public void OnConfirm(InputAction.CallbackContext ctx)
     {
         if (ctx.performed)
-        { 
+        {
             
         }
     }
 
     public void OnDecline(InputAction.CallbackContext ctx)
     {
+        if (ctx.performed)
+        {
+            
+        }
 
     }
 
