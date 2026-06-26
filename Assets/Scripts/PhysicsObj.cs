@@ -364,6 +364,8 @@ public class PhysicsObj : MonoBehaviour
     //adds hitstop time on top of current hitstop
     void AddHitStop(float time)
     {
+        Debug.Log("adding " + time + "sec hitstop");
+
         //init hitstop if not already in hitstop
         if (!isHitStop)
         {
@@ -498,6 +500,17 @@ public class PhysicsObj : MonoBehaviour
 
     public void OnCollisionEnter2D(Collision2D col)
     {
+        //solid terrain already adds 2 frames of hitstop
+
+        //could add some more hitstop...
+        /*
+        //if (isKnockback)
+        {
+            AddHitStop(Mathf.RoundToInt(storedVelocity.magnitude/stats.maxMoveSpeed * 4) * Time.fixedDeltaTime);
+        }
+        */
+        
+
         //use messages to conditionally signal other scripts of what's going on
         //gameObject.SendMessage()
 

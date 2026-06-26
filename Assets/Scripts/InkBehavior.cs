@@ -51,7 +51,7 @@ public class InkBehavior : ItemBehavior
         }
         
         //emit ink cloud on finish
-        SpawnInkObj(charge);
+        //SpawnInkObj(charge);
 
 
         Debug.Log("Ink done!!");

@@ -12,8 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f16488989daad465ca26399e5d31eb46, type: 3}
   m_Name: DefaultSolidTerrainStats
   m_EditorClassIdentifier: 
-  speedMod: 0.95
+  speedMod: 1
   timeMod: 1.2
   powerMod: 1
+  techable: 1
   maxHP: 10
   armor: 99999

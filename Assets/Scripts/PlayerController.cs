@@ -37,6 +37,9 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public Vector2 input_move; //current literal left stick input
     [HideInInspector] public Vector2 aim_move; //last non-zero left stick input
 
+    [HideInInspector] public float lastChargePress; //time since last Charge (A) press
+
+
     //player state tracking
     [HideInInspector] public Queue<PlayerState> prevStates; //queue of previous states used in rewind function
     [HideInInspector] public PlayerState prevState;  //immediate previous state
@@ -51,6 +54,11 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public float stamina;// = stats.maxStamina;
     [HideInInspector] public PlayerState lastCheckPoint;
     [HideInInspector] public float checkPointTimer = 0; //time since last checkpoint update
+
+    [HideInInspector] public bool canWallTech = true;
+    float lastWallTech = 0; //time from last successful walltech
+
+
 
     //commonly used calculations
     [HideInInspector] public float chargeRatio => chargeTime/stats.maxChargeTime;
@@ -100,10 +108,21 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    
-    void OCollisionEnter2D(Collision2D col)
+
+    void OnCollisionEnter2D(Collision2D col)
     {
+        //if terrain is techable
+        if (col.collider.TryGetComponent<SolidTerrain>(out SolidTerrain terrain))
+        {
+            //check for walltech input
+            if (terrain.stats.techable && lastChargePress <= stats.wallTechFrameWindow)
+            {
+                //do walltech
+                
+            }
+        }
         
+
     }
 
     void FixedUpdate()
@@ -112,6 +131,7 @@ public class PlayerController : MonoBehaviour
         DITick();
 
         TrackStateTick();
+        WallTechTick();
 
         RewindTick();
     }
@@ -131,6 +151,23 @@ public class PlayerController : MonoBehaviour
         if (ctx.performed)
         {
             chargePressed = true;
+            
+            if(lastChargePress <= 30 * Time.fixedDeltaTime) //repeat-input lockout time frame data
+            {
+                //Debug.Log("walltech window closed! BRO IS MASHING!!");
+
+                //repeat input closes window
+                canWallTech = false;
+            } else
+            {
+                canWallTech = true;
+
+                
+
+
+            }
+
+            lastChargePress = 0;
 
             //Debug.Log("Player" + pi.playerIndex + " pressed A");
         }
@@ -140,7 +177,27 @@ public class PlayerController : MonoBehaviour
 
             if (!phys.isKnockback && !phys.isHitStop && !isRewind /*&& phys.moveTimer/phys.moveTime > .4f*/)
             {
-                phys.ApplyMove(false, Mathf.Clamp(chargeTime / stats.maxChargeTime, stats.minCharge, 1), aim_move);
+                int startup = (chargeTime/stats.maxChargeTime < stats.minCharge) ? 2:5;
+                //Debug.Log("startup = " + startup);
+
+                //TRY THIS
+                //redirect experiment
+                /*
+                if (phys.isMoving && !phys.isGliding)
+                {
+                    RedirectMove();
+                }
+                else
+                {
+                    StartCoroutine(DelayMove(startup, false, Mathf.Clamp(chargeTime / stats.maxChargeTime, stats.minCharge, 1), aim_move));
+                    //phys.ApplyMove(false, Mathf.Clamp(chargeTime / stats.maxChargeTime, stats.minCharge, 1), aim_move);
+                }
+                */
+
+                StartCoroutine(DelayMove(startup, false, Mathf.Clamp(chargeTime / stats.maxChargeTime, stats.minCharge, 1), aim_move));
+
+                
+
 
                 //update checkpoint status
                 if (phys.currentTerrain.stats.isCheckPoint)
@@ -152,6 +209,49 @@ public class PlayerController : MonoBehaviour
         }
 
     }
+
+    //moves after a frame delay
+    IEnumerator DelayMove(float delay, bool isKB, float moveForce, Vector2 direction)
+    {
+        int count = 0;
+        while (count < delay)
+        {
+            yield return fuWait;
+            count++;
+        }
+        phys.ApplyMove(isKB, moveForce, direction);
+    }
+
+    //new movement tech test
+    void RedirectMove()
+    {
+        Vector2 direction;
+
+        if (Vector2.Angle(aim_move, phys.storedVelocity) <= 115)
+        {
+            //redirect in aim direction
+            direction = aim_move - phys.storedVelocity.normalized;
+        } else
+        {
+            //redirect against current momentum
+            //direction = phys.storedVelocity.normalized + 
+            
+            //parallel component (should be a negative number 0 -> -1)
+            float parallelComp = Mathf.Cos(Mathf.Deg2Rad * Vector2.Angle(aim_move, phys.storedVelocity));
+            //perpendicular component (-1 - 1)
+            float perpComp = -Mathf.Sin(Mathf.Deg2Rad * Vector2.SignedAngle(aim_move, phys.storedVelocity));
+
+            direction = Vector2.Perpendicular(phys.storedVelocity).normalized * perpComp;
+
+        }
+
+
+        //phys.ModifyMove(false, aim_move - phys.storedVelocity.normalized, 1.1f, 1.1f, 1);
+        phys.ModifyMove(false, direction, 1.1f, 1.1f, 1);
+
+
+    }
+
 
     //🅱️ Button = specialCharge
     public void OnBBack(InputAction.CallbackContext ctx)
@@ -446,6 +546,13 @@ public class PlayerController : MonoBehaviour
         }
 
 
+
+    }
+
+    //track + update walltech input buffer window
+    void WallTechTick()
+    {
+        lastChargePress += Time.fixedDeltaTime; //increment input timer
 
     }
 

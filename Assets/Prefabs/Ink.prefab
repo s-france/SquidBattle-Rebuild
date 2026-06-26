@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4663759905729601174}
   - component: {fileID: -863035374094254582}
   - component: {fileID: -4407377776543801562}
+  - component: {fileID: 4441418181019756509}
   m_Layer: 6
   m_Name: Ink
   m_TagString: Untagged
@@ -132,6 +133,7 @@ MonoBehaviour:
   solidCol: {fileID: 0}
   triggerCol: {fileID: 0}
   stats: {fileID: 11400000, guid: 2ca5f1054c1a34ea0b937cb4cc922eac, type: 2}
+  dealsDamage: 1
   isMoving: 0
   isKnockback: 0
   isGliding: 0
@@ -167,3 +169,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lifeSpan: 7
   timer: 0
+--- !u!114 &4441418181019756509
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 932854131873685891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 185c7e36298f944db866dea3974269d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  minSpeed: 10
+  maxSpeed: 20

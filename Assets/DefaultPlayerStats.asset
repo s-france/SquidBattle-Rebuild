@@ -321,7 +321,7 @@ MonoBehaviour:
   maxChargeHoldTime: 3.25
   DIStrength: 1.4
   forwardDIStrength: 9
-  lateralDIStrength: 1.3
+  lateralDIStrength: 2
   glideDeccelDICurve:
     serializedVersion: 2
     m_Curve:
@@ -356,7 +356,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   OOBMoveMod: 0.1
-  maxStamina: 1.5
+  maxStamina: 2
   inventorySize: 1
   rewindSize: 400
   summonAccel: 2

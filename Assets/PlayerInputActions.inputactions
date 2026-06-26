@@ -87,6 +87,17 @@
                 },
                 {
                     "name": "",
+                    "id": "d56ca466-79fb-4f83-8932-f7d935ac532c",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Mouse+Keyboard",
+                    "action": "A/Confirm",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "3a0d7a93-1f06-4f21-97cd-df8ed74f1692",
                     "path": "<SwitchProControllerHID>/buttonSouth",
                     "interactions": "",
@@ -114,6 +125,17 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Controller",
+                    "action": "B/Back",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "af2c59d8-6bfa-4f0f-96de-e19f99e4538a",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Mouse+Keyboard",
                     "action": "B/Back",
                     "isComposite": false,
                     "isPartOfComposite": false
@@ -183,6 +205,17 @@
                     "action": "LeftStick/Aim",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "6b7646f5-ae46-497c-bfb1-3c08f076afb0",
+                    "path": "<Mouse>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Mouse+Keyboard",
+                    "action": "LeftStick/Aim",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 },
                 {
                     "name": "",
@@ -958,6 +991,22 @@
             "devices": [
                 {
                     "devicePath": "<Gamepad>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        },
+        {
+            "name": "Mouse+Keyboard",
+            "bindingGroup": "Mouse+Keyboard",
+            "devices": [
+                {
+                    "devicePath": "<Keyboard>",
+                    "isOptional": false,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<Mouse>",
                     "isOptional": false,
                     "isOR": false
                 }

@@ -11,6 +11,8 @@ public class SolidTerrainStats : ScriptableObject
     public float timeMod;
     public float powerMod;
 
+    public bool techable;  //can players wall tech on this
+
     public float maxHP; //starting hp for this terrain
     public float armor; //armor stat - minimum amount of damage to be counted
     
