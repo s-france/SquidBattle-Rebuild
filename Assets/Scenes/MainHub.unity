@@ -15641,7 +15641,7 @@ MonoBehaviour:
   playerExitEvent:
     m_PersistentCalls:
       m_Calls: []
-  actionMap: MenuContainer
+  actionMap: WorldMap
   playersReadyEvent:
     m_PersistentCalls:
       m_Calls:
