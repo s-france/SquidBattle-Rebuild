@@ -26,7 +26,8 @@ public class WorldMapPlayerController : MonoBehaviour
     {
         if(Token != null)
         {
-            Token.position += (Vector3)MoveVector;
+            
+            Token.position += (Vector3)(MoveVector)*0.5f;
         }
     }
 
@@ -35,13 +36,14 @@ public class WorldMapPlayerController : MonoBehaviour
         if (ctx.performed)
         {
             Debug.Log("A pressed");
-
+            Collider2D TokenCollider = Token.GetComponent<Collider2D>();
             foreach (Transform map in Maps)
             {
-                if (Token.GetComponent<Collider2D>().IsTouching(map.GetComponent<Collider2D>()))
+                if (TokenCollider.IsTouching(map.GetComponent<Collider2D>()))
                 {
                     Debug.Log("True!");
-                } else
+                }
+                else
                 {
                     Debug.Log("False!");
                 }
