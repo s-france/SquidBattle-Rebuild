@@ -8,6 +8,7 @@ using UnityEngine.WSA;
 public class WorldMapSelect : MonoBehaviour
 {
     public Transform[] Tokens;
+    public Transform[] Maps;
     public GameObject cam;
     public GameObject map;
     
@@ -25,8 +26,8 @@ public class WorldMapSelect : MonoBehaviour
         TestFunction();
     }
 
-    //public void Activate(PlayerContainer container)
-    public void Activate()
+    public void Activate(PlayerContainer container = null)
+    // public void Activate()
     {
         Debug.Log("activating world map!");
 
@@ -57,8 +58,8 @@ public class WorldMapSelect : MonoBehaviour
 
     }
 
-    //public void Deactivate(PlayerContainer container)
-    public void Deactivate()
+    public void Deactivate(PlayerContainer container = null)
+    //public void Deactivate()
     {
         cam.SetActive(false);
         map.SetActive(false);

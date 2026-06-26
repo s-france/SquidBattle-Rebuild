@@ -27,7 +27,10 @@ public class WorldMapPlayerController : MonoBehaviour
 
     public void OnConfirm(InputAction.CallbackContext ctx)
     {
-
+        if (ctx.performed)
+        { 
+            
+        }
     }
 
     public void OnDecline(InputAction.CallbackContext ctx)
