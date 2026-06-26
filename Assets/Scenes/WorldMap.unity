@@ -808,8 +808,11 @@ MonoBehaviour:
   - {fileID: 2060581516}
   - {fileID: 759703001}
   - {fileID: 621506715}
+  Maps:
+  - {fileID: 1250800137}
   cam: {fileID: 1542418356}
   map: {fileID: 423254872}
+  originContainer: {fileID: 0}
 --- !u!4 &1803003929
 Transform:
   m_ObjectHideFlags: 0

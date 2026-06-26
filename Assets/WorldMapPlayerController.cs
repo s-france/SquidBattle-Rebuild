@@ -34,11 +34,16 @@ public class WorldMapPlayerController : MonoBehaviour
     {
         if (ctx.performed)
         {
+            Debug.Log("A pressed");
+
             foreach (Transform map in Maps)
             {
                 if (Token.GetComponent<Collider2D>().IsTouching(map.GetComponent<Collider2D>()))
                 {
                     Debug.Log("True!");
+                } else
+                {
+                    Debug.Log("False!");
                 }
             }
         }
