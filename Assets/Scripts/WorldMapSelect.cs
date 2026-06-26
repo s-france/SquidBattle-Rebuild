@@ -44,6 +44,7 @@ public class WorldMapSelect : MonoBehaviour
         {
             player.SwitchCurrentActionMap("WorldMap");
             Tokens[index].position = Vector3.zero;
+            player.GetComponent<WorldMapPlayerController>().Maps = Maps;
             player.GetComponent<WorldMapPlayerController>().Token = Tokens[index];
             index++;
         }
