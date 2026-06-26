@@ -70,7 +70,7 @@ public class LevelController : MonoBehaviour
     {
         WorldMapSelect worldMap = GameObject.FindFirstObjectByType<WorldMapSelect>();
 
-        worldMap.Activate(cont);
+        worldMap.Activate();
         
 
 
