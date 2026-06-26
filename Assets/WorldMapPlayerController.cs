@@ -19,7 +19,10 @@ public class WorldMapPlayerController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        Token.position += (Vector3)MoveVector;
+        if(Token != null)
+        {
+            Token.position += (Vector3)MoveVector;
+        }
     }
 
     public void OnConfirm(InputAction.CallbackContext ctx)

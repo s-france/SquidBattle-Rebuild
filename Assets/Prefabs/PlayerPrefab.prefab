@@ -791,15 +791,51 @@ MonoBehaviour:
     m_ActionId: 89e569dc-c907-4b74-a56a-e3e67e8523ac
     m_ActionName: ConfirmSelection/Exit
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2463731829127018410}
+        m_TargetAssemblyTypeName: WorldMapPlayerController, Assembly-CSharp
+        m_MethodName: OnConfirm
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 0f2ac29f-868e-4ad0-bc2a-d9b18c53bd72
     m_ActionName: WorldMap/Confirm
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2463731829127018410}
+        m_TargetAssemblyTypeName: WorldMapPlayerController, Assembly-CSharp
+        m_MethodName: OnDecline
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 266581bc-a22d-466e-bec0-4f7ba63e565d
     m_ActionName: WorldMap/Cancel
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2463731829127018410}
+        m_TargetAssemblyTypeName: WorldMapPlayerController, Assembly-CSharp
+        m_MethodName: OnMove
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 54e7f19c-a9ac-404b-9f2c-76d9abefcace
     m_ActionName: WorldMap/Move
   m_NeverAutoSwitchControlSchemes: 0
@@ -1047,6 +1083,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5adb783d6f0bf437198804f64200ceb6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Token: {fileID: 0}
 --- !u!1 &7187466699453499684
 GameObject:
   m_ObjectHideFlags: 0
