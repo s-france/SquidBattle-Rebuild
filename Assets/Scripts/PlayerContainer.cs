@@ -44,9 +44,12 @@ public class PlayerContainer : MonoBehaviour
 
         //put player inside container
         pc.phys.CancelMove();
+        
         pc.transform.position = transform.position;
         pc.phys.solidCol.enabled = false;
         pc.phys.triggerCol.enabled = false;
+
+        pc.phys.enabled = false;
 
         //set player inputs to container specifications
         pc.pi.SwitchCurrentActionMap(actionMap);
