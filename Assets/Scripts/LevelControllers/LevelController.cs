@@ -66,6 +66,15 @@ public class LevelController : MonoBehaviour
 
     }
 
+    public void ActivateWorldMap()
+    {
+        WorldMapSelect worldMap = GameObject.FindFirstObjectByType<WorldMapSelect>();
+
+        
+
+
+    }
+
     
 
 

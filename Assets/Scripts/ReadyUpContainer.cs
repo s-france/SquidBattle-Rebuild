@@ -30,6 +30,8 @@ public class ReadyUpContainer : PlayerContainer
         }
 
         //run ReadyUp function
+        
+
         //if all active players are entered/ready -> run ready event
         if (Contents.Count == PlayerManager.Instance.PlayerList.Count)
         {

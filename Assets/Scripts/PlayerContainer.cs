@@ -25,7 +25,7 @@ public class PlayerContainer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        
     }
 
 
@@ -39,6 +39,8 @@ public class PlayerContainer : MonoBehaviour
 
     public void EnterContainer(PlayerController pc)
     {
+        Debug.Log("Player" + pc.data.inGameIdx + " entered Container");
+
         Contents.Add(pc);
         pc.Container = this;
 
