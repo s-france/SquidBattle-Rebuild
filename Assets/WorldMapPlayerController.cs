@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.PlasticSCM.Editor.WebApi;
+using UnityEditor.iOS.Xcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,6 +12,9 @@ public class WorldMapPlayerController : MonoBehaviour
     // Start is called before the first frame update
     [HideInInspector] public Transform Token = null;
     [HideInInspector] private Vector2 MoveVector;
+
+    [HideInInspector] public Transform[] Maps = null;
+
     void Start()
     {
 
@@ -28,8 +32,14 @@ public class WorldMapPlayerController : MonoBehaviour
     public void OnConfirm(InputAction.CallbackContext ctx)
     {
         if (ctx.performed)
-        { 
-            
+        {
+            foreach (Transform map in Maps)
+            {
+                if (Token.GetComponent<Collider2D>().IsTouching(map.GetComponent<Collider2D>()))
+                {
+                    Debug.Log("True!")
+                }
+            }
         }
     }
 
