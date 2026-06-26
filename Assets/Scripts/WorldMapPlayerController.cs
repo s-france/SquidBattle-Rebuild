@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework.Constraints;
 using Unity.PlasticSCM.Editor.WebApi;
 using UnityEditor.iOS.Xcode;
@@ -15,6 +16,7 @@ public class WorldMapPlayerController : MonoBehaviour
     [HideInInspector] private Vector2 MoveVector;
 
     [HideInInspector] public Transform[] Maps = null;
+    [HideInInspector] public int Vote = -1;
 
     void Start()
     {
@@ -24,9 +26,8 @@ public class WorldMapPlayerController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if(Token != null)
+        if(Token != null && Vote ==-1)
         {
-            
             Token.position += (Vector3)(MoveVector)*0.25f;
         }
     }
@@ -37,16 +38,19 @@ public class WorldMapPlayerController : MonoBehaviour
         {
             Debug.Log("A pressed");
             Collider2D TokenCollider = Token.GetComponent<Collider2D>();
+            int index = 0;
             foreach (Transform map in Maps)
             {
-                if (TokenCollider.IsTouching(map.GetComponent<Collider2D>()))
+                if (TokenCollider.IsTouching(map.GetComponent<Collider2D>()) && Vote == -1)
                 {
-                    Debug.Log("True!");
+                    VoteForMap(index);
+                    Vote = index;
                 }
                 else
                 {
                     Debug.Log("False!");
                 }
+                index++;
             }
         }
     }
@@ -55,7 +59,15 @@ public class WorldMapPlayerController : MonoBehaviour
     {
         if (ctx.performed)
         {
-            
+            if (Vote != -1)
+            {
+                UnVoteForMap(Vote);
+                Vote = -1;
+            }
+            else
+            {
+                // Exit the Scene
+            }
         }
 
     }
@@ -64,4 +76,15 @@ public class WorldMapPlayerController : MonoBehaviour
     {
         MoveVector = ctx.ReadValue<Vector2>();
     }
+
+    public void VoteForMap(int Map)
+    {
+        GameManager.Instance.MapVotes.Add(Map);
+    }
+
+    public void UnVoteForMap(int Map)
+    {
+        GameManager.Instance.MapVotes.Remove(Map);
+    }
 }
+

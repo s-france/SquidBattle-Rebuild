@@ -42,9 +42,12 @@ public class WorldMapSelect : MonoBehaviour
         int index = 0;
         foreach (PlayerInput player in PlayerManager.Instance.PlayerList)
         {
+    
+
             player.SwitchCurrentActionMap("WorldMap");
             Tokens[index].position = Vector3.zero;
             player.GetComponent<WorldMapPlayerController>().Maps = Maps;
+            Tokens[index].GetComponent<SpriteRenderer>().color = PlayerManager.Instance.PlayerColors.Colors[player.GetComponent<PlayerController>().data.colorIdx];
             player.GetComponent<WorldMapPlayerController>().Token = Tokens[index];
             index++;
         }

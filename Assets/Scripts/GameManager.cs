@@ -9,6 +9,20 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
     public static Match GameMatch; //match tracking class
 
+    public List<int> MapVotes; // Array for map voting from World Map PC/ World Map Select
+    public struct ModeMapCollection
+    {
+        string name;
+        SubMapCollection[] maps;
+    }
+
+    public struct SubMapCollection
+    {
+        string name;
+        List<int> modes;
+        int[] subMaps;
+    }
+
 
 
     //universal reusable game variables
@@ -35,6 +49,11 @@ public class GameManager : MonoBehaviour
             if (waitForFixedUpdate == null)
             {
                 waitForFixedUpdate = new WaitForFixedUpdate();
+            }
+
+            if (MapVotes == null)
+            {
+                MapVotes = new List<int>();
             }
 
 
@@ -94,6 +113,8 @@ public class Match
 {
     public int gameMode; //gamemode being played
     public int scoreMode; //score calculation mode (for modes with different scoring types)
+    public int map; //map being played on
+
     public List<PlayerController> PlayerList; //list of players in match
     public Dictionary<PlayerController, int> Scores; //scorekeeping dictionary
     public int round = 0; //current round number
@@ -101,10 +122,14 @@ public class Match
     public List<int> ItemsEnabled; //list of enabled items to spawn
 
 
+
+
+
     public Match()
     {
         this.gameMode = 0;
         this.scoreMode = 0;
+        this.map = 0;
         this.pointsToWin = 10;
         this.ItemsEnabled = new List<int>();
 
@@ -132,9 +157,10 @@ public class Match
 
     }
 
-    public Match(int gamemode, int pointstowin, List<int> itemsenabled, int scoremode = 0)
+    public Match(int gamemode, int map, int pointstowin, List<int> itemsenabled, int scoremode = 0)
     {
         this.gameMode = gamemode;
+        this.map = map;
         this.scoreMode = scoremode;
         this.pointsToWin = pointstowin;
         this.ItemsEnabled = itemsenabled;
@@ -161,6 +187,11 @@ public class Match
     {
         gameMode = gmode;
         scoreMode = smode;
+    }
+
+    public void SetMap(int m)
+    {
+        map = m;
     }
 
     public void SetScoreMode(int smode)
