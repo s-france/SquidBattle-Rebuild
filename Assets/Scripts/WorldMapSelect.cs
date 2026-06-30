@@ -25,13 +25,16 @@ public class WorldMapSelect : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        TestFunction();
+        
     }
 
     public void Activate(PlayerContainer container = null)
     // public void Activate()
     {
         Debug.Log("activating world map!");
+
+        //reset map vote pool
+        GameManager.Instance.MapVotes.Clear();
 
         //activate camera
 
@@ -71,11 +74,17 @@ public class WorldMapSelect : MonoBehaviour
     public void Deactivate(PlayerContainer container = null)
     //public void Deactivate()
     {
+        //reset map vote pool
+        GameManager.Instance.MapVotes.Clear();
+
+        //deactivate scene components
         cam.SetActive(false);
         map.SetActive(false);
+
+        //return players to previous state //from container
+        //...
+
     }
 
-    void TestFunction() {
-        //Debug.Log(Tokens[0].GetComponent<Transform>().position.x);
-    }
+
 }
