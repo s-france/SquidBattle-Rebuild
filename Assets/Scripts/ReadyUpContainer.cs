@@ -44,11 +44,25 @@ public class ReadyUpContainer : PlayerContainer
     public void OnPlayerExit(PlayerController pc)
     {
         Contents.Remove(pc);
-        
 
+        DisableCollision();
+        Invoke(nameof(EnableCollision), .5f);
+        
+        
+        
         //eject player in a direction
         pc.phys.ApplyMove(true, EjectStat.magnitude, EjectStat);
 
+    }
+
+    public void DisableCollision()
+    {
+        GetComponent<Collider2D>().enabled = false;
+    }
+
+    public void EnableCollision()
+    {
+        GetComponent<Collider2D>().enabled = true;
     }
 
 

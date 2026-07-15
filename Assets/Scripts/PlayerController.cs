@@ -177,7 +177,7 @@ public class PlayerController : MonoBehaviour
 
             if (!phys.isKnockback && !phys.isHitStop && !isRewind /*&& phys.moveTimer/phys.moveTime > .4f*/)
             {
-                int startup = (chargeTime/stats.maxChargeTime < stats.minCharge) ? 2:5;
+                int startup = (chargeTime/stats.maxChargeTime < stats.minCharge) ? 2:4;
                 //Debug.Log("startup = " + startup);
 
                 //TRY THIS

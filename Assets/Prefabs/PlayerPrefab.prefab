@@ -1084,6 +1084,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Token: {fileID: 0}
+  Maps: []
+  Vote: -1
+  tokenSpeed: 0.5
 --- !u!1 &7187466699453499684
 GameObject:
   m_ObjectHideFlags: 0

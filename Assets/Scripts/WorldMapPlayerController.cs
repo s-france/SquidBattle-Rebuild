@@ -16,6 +16,9 @@ public class WorldMapPlayerController : MonoBehaviour
     [HideInInspector] public Transform[] Maps = null;
     [HideInInspector] public int Vote = -1;
 
+    public float tokenSpeed;
+
+
     WorldMapSelect mapselect;
 
     void Start()
@@ -68,6 +71,9 @@ public class WorldMapPlayerController : MonoBehaviour
             }
             else
             {
+                //sus
+                mapselect = FindFirstObjectByType<WorldMapSelect>();
+
                 // Exit the Scene
                 mapselect.Deactivate();
 
@@ -79,7 +85,7 @@ public class WorldMapPlayerController : MonoBehaviour
 
     public void OnMove(InputAction.CallbackContext ctx)
     {
-        MoveVector = ctx.ReadValue<Vector2>();
+        MoveVector = tokenSpeed * ctx.ReadValue<Vector2>();
     }
 
     public void VoteForMap(int Map)
