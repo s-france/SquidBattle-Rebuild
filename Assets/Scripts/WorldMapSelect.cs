@@ -33,6 +33,8 @@ public class WorldMapSelect : MonoBehaviour
     {
         Debug.Log("activating world map!");
 
+        originContainer = container;
+
         //reset map vote pool
         GameManager.Instance.MapVotes.Clear();
 
@@ -50,7 +52,7 @@ public class WorldMapSelect : MonoBehaviour
             player.SwitchCurrentActionMap("WorldMap");
             Tokens[index].position = Vector3.zero;
             player.GetComponent<WorldMapPlayerController>().Maps = Maps;
-            Tokens[index].GetComponent<SpriteRenderer>().color = PlayerManager.Instance.PlayerColors.Colors[player.GetComponent<PlayerController>().data.colorIdx];
+            Tokens[index].GetComponentInChildren<SpriteRenderer>().color = PlayerManager.Instance.PlayerColors.Colors[player.GetComponent<PlayerController>().data.colorIdx];
             player.GetComponent<WorldMapPlayerController>().Token = Tokens[index];
             index++;
         }
@@ -83,6 +85,12 @@ public class WorldMapSelect : MonoBehaviour
 
         //return players to previous state //from container
         //...
+        foreach (PlayerInput player in PlayerManager.Instance.PlayerList)
+        {
+            originContainer.ExitContainer(player.GetComponent<PlayerController>());
+
+        }
+
 
     }
 

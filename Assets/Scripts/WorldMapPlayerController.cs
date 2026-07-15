@@ -8,8 +8,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class WorldMapPlayerController : MonoBehaviour
-
-
 {
     // Start is called before the first frame update
     [HideInInspector] public Transform Token = null;
@@ -18,17 +16,21 @@ public class WorldMapPlayerController : MonoBehaviour
     [HideInInspector] public Transform[] Maps = null;
     [HideInInspector] public int Vote = -1;
 
+    WorldMapSelect mapselect;
+
     void Start()
     {
+        //this feels sus...
+        mapselect = FindFirstObjectByType<WorldMapSelect>();
 
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        if(Token != null && Vote ==-1)
+        if(Token != null && Vote == -1)
         {
-            Token.position += (Vector3)(MoveVector)*0.25f;
+            Token.position += (Vector3)(MoveVector) * 0.25f;
         }
     }
 
@@ -67,6 +69,9 @@ public class WorldMapPlayerController : MonoBehaviour
             else
             {
                 // Exit the Scene
+                mapselect.Deactivate();
+
+                
             }
         }
 

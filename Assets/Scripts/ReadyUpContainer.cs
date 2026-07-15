@@ -44,8 +44,10 @@ public class ReadyUpContainer : PlayerContainer
     public void OnPlayerExit(PlayerController pc)
     {
         Contents.Remove(pc);
+        
 
         //eject player in a direction
+        pc.phys.ApplyMove(true, EjectStat.magnitude, EjectStat);
 
     }
 
